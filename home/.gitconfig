@@ -1,0 +1,12 @@
+[user]
+	name = RingOfStorms (Joshua Bell)
+	email = ringofstorms@gmail.com
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+[core]
+	pager = cat
+[pull]
+	rebase = false
