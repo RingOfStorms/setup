@@ -4,6 +4,7 @@ let mapleader = " "
 " Show line numbers
 set number
 set title
+set shell=zsh\ -li
 " set titlestring="%{ }"
 
 " Keybindings for split screen to move between screens with ctrl
