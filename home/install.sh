@@ -57,6 +57,8 @@ confirm_file_del $FILE
 link_if_ne $FILE $SCRIPT_DIR/.gitconfig
 
 # nvim requirements
+echo "TODO NEED TO NOT INSTALL BREW IF LINUX THIS PART WILL FAIL BUT CONTINUE"
+if ! (echo -n "brew\t" && brew --version) ; then echo "Installing brew..." && (/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)") fi
 if ! (echo -n "nvim\t" && nvim --version) ; then echo "Install nvim..." && (brew --version &> /dev/null && brew install nvim || sudo snap install --beta nvim --classic) fi
 if ! (echo -n "fzf\t" && fzf --version) ; then echo "Installing fzf..." && (brew --version &> /dev/null && brew install fzf || sudo apt install fzf) fi
 if ! (echo -n "rg\t" && rg --version) ; then echo "Installing rg..." && (brew --version &> /dev/null && brew install rg || sudo apt install ripgrep) fi
