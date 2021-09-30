@@ -1,0 +1,172 @@
+export CLICOLOR=1
+export LSCOLORS=gxBxhxDxfxhxhxhxhxcxcx
+
+
+git config --global core.pager cat
+git config --global core.excludesfile ~/.gitignore
+Git config --global core.config ~/.gitconfig
+
+# Unix
+alias ll="ls -al"
+alias la="ls -A"
+alias psg='ps aux | grep -v "grep" | grep'
+# OSX
+alias caff="caffeinate -di &!"
+# SQL | POSTGRES
+alias sql8_0="docker exec -it mysql8.0 mysql -uroot --password=password"
+alias sql5_6="docker exec -it mysql5.6 mysql -uroot --password=password"
+alias sql="sql8_0"
+alias psql11='docker exec -it postgres11 psql -Upostgres'
+alias psql12='docker exec -it postgres12 psql -Upostgres'
+alias psql='psql12'
+# SCREEN
+alias s='screen'
+alias sx='screen -x'
+alias sr='screen -r'
+alias sls='screen -ls'
+# GIT
+alias stash='git stash'
+alias pop'git stash pop'
+alias branch='git checkout -b'
+alias status='git status'
+alias diff='git diff'
+alias branches='git branch -a'
+alias gam='git commit -a -m'
+# CARGO
+alias c='cargo'
+# K8s
+alias k='kubectl'
+# [[n]v]im
+alias n=nvim
+# docker
+alias d='docker'
+alias dr='docker image rm'
+alias drm='docker image prune --filter "dangling=true" -f'
+alias drun='docker run --rm -it -v "${HOME}/.aws:/root/.aws" -v "${HOME}/.ssh:/root/.ssh" -v "${PWD}:/workdir" -w /workdir'
+# Calendar
+alias today="watch -c -n 60 icalBuddy -f -n -sd eventsToday"
+
+# Remarkable
+resnap () {
+# output_jpg	File to save screenshot to (default resnap.jpg)
+# -v --version	Display version and exit
+# -i		path to ssh pubkey
+# -r		Address of reMarkable (default 10.11.99.1)
+# -h --help	Display usage and exit
+  /Users/joshua.bell/other/resnap.sh
+}
+
+# GIT COMMANDS
+getdefault () {
+  git remote show origin | grep "HEAD branch" | sed 's/.*: //'
+}
+
+master () {
+    git stash
+    git checkout $(getdefault)
+    pull
+}
+
+pullmaster () {
+    git pull origin $(getdefault)
+}
+
+push () {
+  B=$(git branch | sed -n -e 's/^\* \(.*\)/\1/p')
+  git pull origin $B
+  git push origin $B
+}
+
+pull () {
+  git fetch
+  B=$(git branch | sed -n -e 's/^\* \(.*\)/\1/p')
+  git pull origin $B
+}
+
+forcepush () {
+  B=$(git branch | sed -n -e 's/^\* \(.*\)/\1/p')
+  git push origin $B --force
+}
+
+remote_branches () {
+  git branch -a | grep 'remotes' | grep -v -E '.*(HEAD|${DEFAULT})' | cut -d'/' -f 3-
+}
+
+local_branches () {
+  git branch -a | grep -v 'remotes' | grep -v -E '.*(HEAD|${DEFAULT})' | grep -v '^*' |  cut -d' ' -f 3-
+}
+
+prunel () {
+  git fetch
+  git remote prune origin
+
+  for local in $(local_branches); do
+    in=false
+    for remote in $(remote_branches); do
+      if [[ ${local} = ${remote} ]]; then
+        in=true
+      fi
+    done;
+    if [[ $in = 'false' ]]; then
+      git branch -D ${local}
+    else
+      echo 'Skipping branch '${local}
+    fi
+  done;
+}
+
+checkout () {
+  git fetch
+  git checkout $1
+  pull
+}
+
+# Unix - random commands
+title () {
+  echo -en "\033]0;$1\a"
+}
+
+kill_port() {
+  PIDS=$(lsof -i :$1 | awk 'FRN < NR-1 {print $2}')
+  echo 'Killing: '${PIDS}
+  for pid in ${PIDS}; do
+    kill -9 ${pid} &> /dev/null
+  done;
+}
+
+kill_psg() {
+  if [[ $1 == "tnode" ]]; then
+    tnodequit
+    exit
+  fi
+
+  PIDS=$(ps aux | grep -v "grep" | grep ${1} | awk '{print $2}')
+  echo Quitting ${PIDS}
+  for pid in ${PIDS}; do
+    kill -9 ${pid} &> /dev/null
+  done;
+}
+
+mail_clear() {
+    : > /var/mail/$USER
+}
+
+# NPM package
+pack () {
+    npm run clean && npm run build && npm pack
+}
+
+rm_node_modules () {
+  find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +
+}
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+if [ -f $(brew --prefix)/etc/bash_completion ]; then
+    . $(brew --prefix)/etc/bash_completion
+fi
+
+export PATH="${HOME}/.cargo/bin:${PATH}"
+

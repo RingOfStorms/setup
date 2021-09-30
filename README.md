@@ -9,7 +9,10 @@
 	- Install powerlevel 10k https://github.com/romkatv/powerlevel10k#oh-my-zsh (dont forget to edit .zshrc for step 2)
 	- Start new terminal, verify fonts
 		- Classic, unicode, dark, no time, angled, sharp, flat, two lines, dotted, full, compact, many icons, concise, yes transient, verbose, apply yes
-
+	- Install `git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting`
+	- Install `git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions`
+	- open ~/.zshrc
+	  - plugins=(git npm osx zsh-syntax-highlighting zsh-autosuggestions)
 # Default Applications
 
 ## Mac

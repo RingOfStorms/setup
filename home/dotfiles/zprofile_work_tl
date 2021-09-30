@@ -1,0 +1,169 @@
+export TEMPUS_USER_ID='ebf230f6-8443-4bbd-ac2d-538ca35dd5cd'
+export TEMPUS_TENANT_ID='0066be0c-1687-4fd9-8a95-d8a85cd16a6f'
+
+# Tempus Tokens
+# https://tempus.oktapreview.com/oauth2/ausudtf4sc4dGgLrN0h7
+alias token_zro="okta-personal-token get preview/Tempus-ZRO | tr -d '\n'"
+alias tz="token_zro | pbcopy"
+alias token_alp="okta-personal-token get preview/Tempus-ALP | tr -d '\n'"
+alias ta="token_alp | pbcopy"
+alias token_bet="okta-personal-token get preview/sundial-staging | tr -d '\n'"
+alias tb="token_bet | pbcopy"
+alias ts="tb"
+alias token_vld="okta-personal-token get prod/Tempus-VAL | tr -d '\n'"
+alias tv="token_vld | pbcopy"
+alias token_prd="okta-personal-token get prod/sundial-production | tr -d '\n'"
+alias tp="token_prd | pbcopy"
+alias vip='vi "+cal cursor(3,18)" -c "startinsert"'
+
+# Tempus Specific
+tam () {
+  if [[ $1 = "update" && $2 = "all" ]]; then
+    echo "updating all tam apps"
+    tam update tam
+    tam update business-time
+    tam update ctv
+    tam update okta-personal-token
+    tam update tacos
+  else
+    command tam $@
+  fi
+}
+
+ssample () {
+  RET=$(pwd)
+  cd ~/tempus/dps-sdk_ts; npx ts-node examples/service/sampleBetas.ts $@; cd $RET
+}
+
+killt () {
+  sudo launchctl remove com.tanium.taniumclient
+  sudo launchctl remove com.crowdstrike.falcond
+}
+
+dbaproxy_refresh() {
+    ssh-keygen -R dbaproxy.devtempus.com
+    ssh-keygen -R dbaproxy.securetempus.com
+}
+
+dbaproxy () {
+  dbaproxy_refresh
+
+  ssh ringofstorms@dbaproxy.devtempus.com
+}
+
+aws_token() {
+  HOSTNAME=$1
+  PORT=$2
+  USER=$3
+  REGION=$4
+  echo $(aws rds generate-db-auth-token --profile "tempusdevops-eng-team-engineer" --hostname "${HOSTNAME}" --port "${PORT}" --username "${USER}" --region="${REGION}")
+}
+
+tunnel() {
+  dbaproxy_refresh
+
+  SERVICE=$1
+  ENV=$2
+  LPORT=$(awk -F, -v service="${SERVICE}" -v env="${ENV}" '$1 == service && $2 == env { print $3 }' ~/.databases)
+  URI=$(awk -F, -v service="${SERVICE}" -v env="${ENV}" '$1 == service && $2 == env { print $4 }' ~/.databases)
+  RPORT=$(awk -F, -v service="${SERVICE}" -v env="${ENV}" '$1 == service && $2 == env { print $5 }' ~/.databases)
+
+  ssh -N -L ${LPORT}:${URI}:${RPORT} ringofstorms@dbaproxy.devtempus.com -v
+}
+
+db() {
+  SERVICE=$1
+  ENV=$2
+  LPORT=$(awk -F, -v service="${SERVICE}" -v env="${ENV}" '$1 == service && $2 == env { print $3 }' ~/.databases)
+  URI=$(awk -F, -v service="${SERVICE}" -v env="${ENV}" '$1 == service && $2 == env { print $4 }' ~/.databases)
+  RPORT=$(awk -F, -v service="${SERVICE}" -v env="${ENV}" '$1 == service && $2 == env { print $5 }' ~/.databases)
+  DIALECT=$(awk -F, -v service="${SERVICE}" -v env="${ENV}" '$1 == service && $2 == env { print $6 }' ~/.databases)
+  DATABASE=$(awk -F, -v service="${SERVICE}" -v env="${ENV}" '$1 == service && $2 == env { print $7 }' ~/.databases)
+  USER=$(awk -F, -v service="${SERVICE}" -v env="${ENV}" '$1 == service && $2 == env { print $8 }' ~/.databases)
+  REGION=$(awk -F, -v service="${SERVICE}" -v env="${ENV}" '$1 == service && $2 == env { print $9 }' ~/.databases)
+  TOKEN=$(aws_token ${URI} ${RPORT} ${USER} ${REGION})
+
+  if [[ ${DIALECT} = 'psql' ]]; then
+    docker run \
+      -it \
+      --rm \
+      postgres:12 \
+      psql "dbname=${DATABASE} host=docker.for.mac.host.internal port=${LPORT} user=${USER} password=${TOKEN}"
+  else
+    docker run \
+      -it \
+      --rm \
+      mysql:8.0 \
+        mysql \
+          --binary-as-hex \
+          --enable-cleartext-plugin \
+          --port=${LPORT} \
+          --password=${TOKEN} \
+          -u${USER} \
+          -hdocker.for.mac.host.internal \
+          ${DATABASE}
+  fi
+}
+
+db_token() {
+  SERVICE=$1
+  ENV=$2
+  URI=$(awk -F, -v service="${SERVICE}" -v env="${ENV}" '$1 == service && $2 == env { print $4 }' ~/.databases)
+  RPORT=$(awk -F, -v service="${SERVICE}" -v env="${ENV}" '$1 == service && $2 == env { print $5 }' ~/.databases)
+  USER=$(awk -F, -v service="${SERVICE}" -v env="${ENV}" '$1 == service && $2 == env { print $8 }' ~/.databases)
+  REGION=$(awk -F, -v service="${SERVICE}" -v env="${ENV}" '$1 == service && $2 == env { print $9 }' ~/.databases)
+  TOKEN=$(aws_token ${URI} ${RPORT} ${USER} ${REGION})
+  echo $TOKEN
+}
+
+rprod() {
+  FROM_PWD=$(pwd)
+  cd ~/Desktop/scripts/dps
+  TOKEN=$(PROD=1 token) npx ts-node reconcile.ts
+  cd $FROM_PWD
+}
+
+rstag() {
+  FROM_PWD=$(pwd)
+  cd ~/Desktop/scripts/dps
+  TOKEN=$(token) DOMAIN=stagingtempus npx ts-node reconcile.ts
+  cd $FROM_PWDa
+}
+
+tnodequit() {
+    PIDS=$(ps aux | grep node | grep tempus | awk '{print $2}')
+    echo 'Killing: '${PIDS}
+    for pid in ${PIDS}; do
+      kill -9 ${pid} &> /dev/null
+    done;
+}
+
+lin () {
+  SPEC_TO_LINT=$1 npm run test:nocoverage -- schemas
+}
+
+lif () {
+  npx ts-node ~/Desktop/scripts/dps/fix_lints.ts ~/tempus/dps/data-product-specs/$1
+  npx prettier schemas data-product-specs/$1 --check --write
+  lin $1
+}
+
+cl () {
+  git checkout fix_linting
+}
+
+ca () {
+  git checkout fix_linting_ammendments
+}
+
+putdp () {
+  date=$(date)
+  url=$(pbpaste)
+  curl \
+    --location \
+    --request PUT \
+    "$url" \
+    --header 'Content-Type: text/plain' \
+    --data-raw "test data ${date}"
+}
+

@@ -36,6 +36,23 @@ function load_nvm {
     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
 }
 
+# profiles
+touch ~/.zprofile
+if ! grep -q zprofile_mine ~/.zprofile; then
+  echo "sourcing custom zprofile..."
+  echo "\nsource "$SCRIPT_DIR"/dotfiles/zprofile_mine" >> ~/.zprofile
+fi
+if ! grep -q zprofile_work_tl ~/.zprofile; then
+  echo "sourcing custom zprofile work tl..."
+  echo "\nsource "$SCRIPT_DIR"/dotfiles/zprofile_work_tl" >> ~/.zprofile
+fi
+
+# zshenv
+echo
+FILE=~/.zshenv
+confirm_file_del $FILE
+link_if_ne $FILE ~/.zshrc
+
 # git ignore
 echo
 mkdir -p ~/.config/git
@@ -48,13 +65,13 @@ echo
 mkdir -p ~/.config/.vim/undodir
 FILE=~/.vimrc
 confirm_file_del $FILE
-link_if_ne $FILE $SCRIPT_DIR/.vimrc
+link_if_ne $FILE $SCRIPT_DIR/config/nvim/vimrc
 
 # git
 echo
 FILE=~/.gitconfig
 confirm_file_del $FILE
-link_if_ne $FILE $SCRIPT_DIR/.gitconfig
+link_if_ne $FILE $SCRIPT_DIR/config/git/gitconfig
 
 # nvim requirements
 echo "TODO NEED TO NOT INSTALL BREW IF LINUX THIS PART WILL FAIL BUT CONTINUE"

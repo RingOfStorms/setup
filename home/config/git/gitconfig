@@ -8,7 +8,5 @@
 	required = true
 [core]
 	pager = cat
-	excludesfile = /Users/joshua.bell/.gitignore
-	config = /Users/joshua.bell/.gitconfig
 [pull]
 	rebase = false
