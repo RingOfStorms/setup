@@ -31,7 +31,7 @@ alias branch='git checkout -b'
 alias status='git status'
 alias diff='git diff'
 alias branches='git branch -a'
-alias gam='git commit -a -m'
+alias gcam='git commit -a -m'
 # CARGO
 alias c='cargo'
 # K8s
