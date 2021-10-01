@@ -80,11 +80,13 @@ if ! (echo -n "nvim\t" && nvim --version) ; then echo "Install nvim..." && (brew
 if ! (echo -n "fzf\t" && fzf --version) ; then echo "Installing fzf..." && (brew --version &> /dev/null && brew install fzf || sudo apt install fzf) fi
 if ! (echo -n "rg\t" && rg --version) ; then echo "Installing rg..." && (brew --version &> /dev/null && brew install rg || sudo apt install ripgrep) fi
 if ! (echo -n "curl\t" && curl --version) ; then echo "Installing curl..." && (brew --version &> /dev/null && brew install curl || sudo apt install curl) fi
+echo "TODO install FD brew install fd https://github.com/sharkdp/fd#installation"
 if ! (load_nvm && nvm --version &> /dev/null); then
   echo "installing nvm..."
   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
   load_nvm
   nvm install --lts
+  npm install -g neovim
 fi
 if ! (echo -n "pyright\t" && npm list -g pyright) ; then echo "Installing pyright..." && npm install -g pyright ;fi
 if ! (echo -n "typescript\t" && npm list -g typescript) ; then echo "Installing typescript..." && npm install -g typescript ;fi
