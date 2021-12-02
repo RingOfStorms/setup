@@ -3,7 +3,7 @@
 `chsh -s /bin/zsh` to switch to zsh on macos
 
 - Install powerlevel 10k https://github.com/romkatv/powerlevel10k#meslo-nerd-font-patched-for-powerlevel10k
-	- Install font files first
+	- Install font files first https://github.com/romkatv/powerlevel10k#user-content-manual-font-installation
 	- Install oh my zsh https://ohmyz.sh/
 		- `sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"`
 	- Install powerlevel 10k https://github.com/romkatv/powerlevel10k#oh-my-zsh (dont forget to edit .zshrc for step 2)
@@ -12,7 +12,7 @@
 	- Install `git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting`
 	- Install `git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions`
 	- open ~/.zshrc
-	  - plugins=(git npm osx zsh-syntax-highlighting zsh-autosuggestions)
+	  - plugins=(git npm macos zsh-syntax-highlighting zsh-autosuggestions)
 # Default Applications
 
 ## Mac

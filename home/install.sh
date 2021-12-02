@@ -37,21 +37,26 @@ function load_nvm {
 }
 
 # profiles
+confirm_file_del ~/.zprofile
 touch ~/.zprofile
 if ! grep -q zprofile_mine ~/.zprofile; then
   echo "sourcing custom zprofile..."
   echo "\nsource "$SCRIPT_DIR"/dotfiles/zprofile_mine" >> ~/.zprofile
 fi
 if ! grep -q zprofile_work_tl ~/.zprofile; then
-  echo "sourcing custom zprofile work tl..."
-  echo "\nsource "$SCRIPT_DIR"/dotfiles/zprofile_work_tl" >> ~/.zprofile
+  yes_or_no "Source custom zprofile work tl?" && \
+    echo "\nsource "$SCRIPT_DIR"/dotfiles/zprofile_work_tl" >> ~/.zprofile
+fi
+if ! grep -q zprofile_mine_mbp ~/.zprofile; then
+  yes_or_no "Source custom zprofile mine mbp?" && \
+    echo "\nsource "$SCRIPT_DIR"/dotfiles/zprofile_mine_mbp" >> ~/.zprofile
 fi
 
 # zshenv
-echo
-FILE=~/.zshenv
-confirm_file_del $FILE
-link_if_ne $FILE ~/.zshrc
+#echo # i dont remember why I added this here, is it copy pasta?
+#FILE=~/.zshrc
+#confirm_file_del $FILE
+#link_if_ne $FILE ~/.zshrc
 
 # git ignore
 echo

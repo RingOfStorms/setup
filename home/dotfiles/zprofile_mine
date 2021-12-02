@@ -1,7 +1,6 @@
 export CLICOLOR=1
 export LSCOLORS=gxBxhxDxfxhxhxhxhxcxcx
 
-
 git config --global core.pager cat
 git config --global core.excludesfile ~/.gitignore
 Git config --global core.config ~/.gitconfig
@@ -45,6 +44,8 @@ alias drm='docker image prune --filter "dangling=true" -f'
 alias drun='docker run --rm -it -v "${HOME}/.aws:/root/.aws" -v "${HOME}/.ssh:/root/.ssh" -v "${PWD}:/workdir" -w /workdir'
 # Calendar
 alias today="watch -c -n 60 icalBuddy -f -n -sd eventsToday"
+# say
+alias say="say -v veena"
 
 # Remarkable
 resnap () {
@@ -168,5 +169,5 @@ if [ -f $(brew --prefix)/etc/bash_completion ]; then
     . $(brew --prefix)/etc/bash_completion
 fi
 
+# Rust
 export PATH="${HOME}/.cargo/bin:${PATH}"
-
