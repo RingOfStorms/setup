@@ -2,7 +2,7 @@ export JAVA_HOME=$(/usr/libexec/java_home)
 export JRE_HOME=$(/usr/libexec/java_home)
 
 GITHUB_USERNAME=RingOfStorms
-GITHUB_TOKEN=25a53744a4b28e7b3e2635aa3ade21a2c4edd280
+GITHUB_TOKEN=woopsie
 
 # gradle
 gradle () {
