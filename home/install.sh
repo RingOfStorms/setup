@@ -98,9 +98,11 @@ if ! (echo -n "typescript-language-server\t" && npm list -g typescript-language-
 
 # nvim settings
 mkdir -p ~/.config/nvim
+
 FILE=~/.config/nvim/init.vim
 confirm_file_del $FILE
 link_if_ne $FILE $SCRIPT_DIR/config/nvim/init.vim
+
 FILE=~/.config/nvim/settings
 confirm_file_del $FILE
 link_if_ne $FILE $SCRIPT_DIR/config/nvim/settings
@@ -108,4 +110,5 @@ link_if_ne $FILE $SCRIPT_DIR/config/nvim/settings
 nvim --headless +PlugInstall +qall
 nvim --headless +TSInstall +qall
 
+# # # # #
 echo done
