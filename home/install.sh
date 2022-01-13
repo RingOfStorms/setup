@@ -37,21 +37,26 @@ function load_nvm {
 }
 
 # profiles
+confirm_file_del ~/.zprofile
 touch ~/.zprofile
 if ! grep -q zprofile_mine ~/.zprofile; then
   echo "sourcing custom zprofile..."
   echo "\nsource "$SCRIPT_DIR"/dotfiles/zprofile_mine" >> ~/.zprofile
 fi
 if ! grep -q zprofile_work_tl ~/.zprofile; then
-  echo "sourcing custom zprofile work tl..."
-  echo "\nsource "$SCRIPT_DIR"/dotfiles/zprofile_work_tl" >> ~/.zprofile
+  yes_or_no "Source custom zprofile work tl?" && \
+    echo "\nsource "$SCRIPT_DIR"/dotfiles/zprofile_work_tl" >> ~/.zprofile
+fi
+if ! grep -q zprofile_mine_mbp ~/.zprofile; then
+  yes_or_no "Source custom zprofile mine mbp?" && \
+    echo "\nsource "$SCRIPT_DIR"/dotfiles/zprofile_mine_mbp" >> ~/.zprofile
 fi
 
 # zshenv
-echo
-FILE=~/.zshenv
-confirm_file_del $FILE
-link_if_ne $FILE ~/.zshrc
+#echo # i dont remember why I added this here, is it copy pasta?
+#FILE=~/.zshrc
+#confirm_file_del $FILE
+#link_if_ne $FILE ~/.zshrc
 
 # git ignore
 echo
@@ -95,9 +100,11 @@ if ! (echo -n "typescript-language-server\t" && npm list -g typescript-language-
 
 # nvim settings
 mkdir -p ~/.config/nvim
+
 FILE=~/.config/nvim/init.vim
 confirm_file_del $FILE
 link_if_ne $FILE $SCRIPT_DIR/config/nvim/init.vim
+
 FILE=~/.config/nvim/settings
 confirm_file_del $FILE
 link_if_ne $FILE $SCRIPT_DIR/config/nvim/settings
@@ -105,4 +112,5 @@ link_if_ne $FILE $SCRIPT_DIR/config/nvim/settings
 nvim --headless +PlugInstall +qall
 nvim --headless +TSInstall +qall
 
+# # # # #
 echo done
