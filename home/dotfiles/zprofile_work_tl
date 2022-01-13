@@ -15,6 +15,8 @@ alias tv="token_vld | pbcopy"
 alias token_prd="okta-personal-token get prod/sundial-production | tr -d '\n'"
 alias tp="token_prd | pbcopy"
 alias vip='vi "+cal cursor(3,18)" -c "startinsert"'
+# Tempus Tacos
+alias tacos='AWS_PROFILE=tempus-science-joshua-bell tacos'
 
 # Tempus Specific
 tam () {
@@ -38,6 +40,9 @@ ssample () {
 killt () {
   sudo launchctl remove com.tanium.taniumclient
   sudo launchctl remove com.crowdstrike.falcond
+  sudo launchctl remove com.cososys.eppclient.launchdaemon
+  sudo launchctl remove application.com.cososys.eppclient.notifier.968123.2041518
+  kill_psg endpointsecurityd
 }
 
 dbaproxy_refresh() {
@@ -138,22 +143,16 @@ tnodequit() {
     done;
 }
 
-lin () {
-  SPEC_TO_LINT=$1 npm run test:nocoverage -- schemas
-}
-
-lif () {
-  npx ts-node ~/Desktop/scripts/dps/fix_lints.ts ~/tempus/dps/data-product-specs/$1
-  npx prettier schemas data-product-specs/$1 --check --write
-  lin $1
-}
-
-cl () {
-  git checkout fix_linting
-}
-
-ca () {
-  git checkout fix_linting_ammendments
+dps_sql_prd () {
+  QUERY=$(node -e "console.log(JSON.stringify({rawQueryString:process.argv[1]}))" "$@")
+  RESPONSE=$(curl -X 'PATCH' \
+    'https://data-products.securetempus.com/database/adHocSQLQuery' \
+    -H 'accept: application/json' \
+    -H 'Authorization: Bearer '$(token_prd) \
+    -H 'Content-Type: application/json' \
+    -d ${QUERY})
+  echo ${RESPONSE}
+  echo ${RESPONSE} | jq '.queryResponse | del(._types, ._parsers)'
 }
 
 putdp () {
@@ -167,3 +166,13 @@ putdp () {
     --data-raw "test data ${date}"
 }
 
+spec_reviews () {
+  curl -X 'GET' \
+    'https://data-products.securetempus.com/v3/data-product-specs?limit=30&status=REVIEW' \
+    -H 'accept: */*' \
+    -H 'Authorization: Bearer '$(token_prd) \
+    | jq '.items[] | .id + " " + .type + " " + .version + " " + .creator' \
+    | column -t
+}
+
+export PATH="${PATH}:${HOME}/dev/home_bins/google-cloud-sdk/bin"

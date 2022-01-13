@@ -26,7 +26,7 @@ alias sr='screen -r'
 alias sls='screen -ls'
 # GIT
 alias stash='git stash'
-alias pop'git stash pop'
+alias pop='git stash pop'
 alias branch='git checkout -b'
 alias status='git status'
 alias diff='git diff'
@@ -45,6 +45,12 @@ alias drm='docker image prune --filter "dangling=true" -f'
 alias drun='docker run --rm -it -v "${HOME}/.aws:/root/.aws" -v "${HOME}/.ssh:/root/.ssh" -v "${PWD}:/workdir" -w /workdir'
 # Calendar
 alias today="watch -c -n 60 icalBuddy -f -n -sd eventsToday"
+
+explain () {
+  CMD=$(jq -rn --arg x "$(echo $@)" '$x|@uri')
+  w3m
+  open https://explainshell.com/explain?cmd=$CMD
+}
 
 # Remarkable
 resnap () {
