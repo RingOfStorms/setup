@@ -17,6 +17,7 @@ alias sql5_6="docker exec -it mysql5.6 mysql -uroot --password=password"
 alias sql="sql8_0"
 alias psql11='docker exec -it postgres11 psql -Upostgres'
 alias psql12='docker exec -it postgres12 psql -Upostgres'
+alias psql14='docker exec -it postgres14 psql -Upostgres'
 alias psql='psql12'
 # SCREEN
 alias s='screen'
@@ -46,6 +47,10 @@ alias drun='docker run --rm -it -v "${HOME}/.aws:/root/.aws" -v "${HOME}/.ssh:/r
 alias today="watch -c -n 60 icalBuddy -f -n -sd eventsToday"
 # say
 alias say="say -v veena"
+
+decode_jwt () {
+  jq -R 'gsub("-";"+") | gsub("_";"/") | split(".") | .[1] | @base64d | fromjson' <<< $@
+}
 
 explain () {
   CMD=$(jq -rn --arg x "$(echo $@)" '$x|@uri')

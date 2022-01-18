@@ -3,16 +3,16 @@ export TEMPUS_TENANT_ID='0066be0c-1687-4fd9-8a95-d8a85cd16a6f'
 
 # Tempus Tokens
 # https://tempus.oktapreview.com/oauth2/ausudtf4sc4dGgLrN0h7
-alias token_zro="okta-personal-token get preview/Tempus-ZRO | tr -d '\n'"
+alias token_zro="okta-personal-token get preview/Tempus-ZRO 2> /dev/null | tr -d '\n'"
 alias tz="token_zro | pbcopy"
-alias token_alp="okta-personal-token get preview/Tempus-ALP | tr -d '\n'"
+alias token_alp="okta-personal-token get preview/Tempus-ALP 2> /dev/null | tr -d '\n'"
 alias ta="token_alp | pbcopy"
-alias token_bet="okta-personal-token get preview/sundial-staging | tr -d '\n'"
+alias token_bet="okta-personal-token get preview/sundial-staging 2> /dev/null | tr -d '\n'"
 alias tb="token_bet | pbcopy"
 alias ts="tb"
-alias token_vld="okta-personal-token get prod/Tempus-VAL | tr -d '\n'"
+alias token_vld="okta-personal-token get prod/Tempus-VAL 2> /dev/null | tr -d '\n'"
 alias tv="token_vld | pbcopy"
-alias token_prd="okta-personal-token get prod/sundial-production | tr -d '\n'"
+alias token_prd="okta-personal-token get prod/sundial-production 2> /dev/null | tr -d '\n'"
 alias tp="token_prd | pbcopy"
 alias vip='vi "+cal cursor(3,18)" -c "startinsert"'
 # Tempus Tacos
@@ -168,11 +168,72 @@ putdp () {
 
 spec_reviews () {
   curl -X 'GET' \
-    'https://data-products.securetempus.com/v3/data-product-specs?limit=30&status=REVIEW' \
-    -H 'accept: */*' \
+    'https://data-products.securetempus.com/v3/data-product-specs?limit=100&status=REVIEW' \
     -H 'Authorization: Bearer '$(token_prd) \
     | jq '.items[] | .id + " " + .type + " " + .version + " " + .creator' \
     | column -t
+}
+
+spec_get_reviewers () {
+  curl -X 'GET' \
+      'https://data-products.securetempus.com/v3/data-product-specs/'$1'/reviews?limit=100' \
+      -H 'Authorization: Bearer '$(token_prd)
+}
+
+spec_del_review () {
+  curl -X 'DELETE' \
+       'https://data-products.securetempus.com/v3/data-product-specs/review/'$1 \
+       -H 'Authorization: Bearer '$(token_prd)
+}
+
+spec_add_review () {
+  curl -X 'POST' \
+     'https://data-products.securetempus.com/v3/data-product-specs/review' \
+     -H 'Authorization: Bearer '$(token_prd) \
+     -H 'Content-Type: application/json' \
+     -d '{"dataProductSpecId": "'$1'","reviewGroup": "REQUIRED","reviewer": "'$2'"}' \
+     &>/dev/null
+}
+
+spec_overwrite_eco_reviewers_with () {
+  SPEC_ID=$1
+  if [ -z "$2" ]; then
+    ASSIGN_TO=$(decode_jwt $(token_bet) | jq '.sub' | sed 's/"//g')
+  else
+    ASSIGN_TO="$2"
+  fi
+  ECO_TEAM=("aaron.zipursky@tempus.com" "gregory.block@tempus.com" "jesse.shellabarger@tempus.com" "varun.nandu@tempus.com" "joshua.bell@tempus.com" "khalid.ahmed@tempus.com" "udayarc.reddy@tempus.com")
+  PENDING_REVIEWERS=$(spec_get_reviewers $SPEC_ID | jq '[.items[] | select(.reviewStatus=="PENDING")]')
+
+  echo "Editing reviewers for spec "$SPEC_ID":"
+
+  for EMAIL in ${ECO_TEAM[@]}; do
+    RESULT=$(echo $PENDING_REVIEWERS | jq --arg email "$EMAIL" '.[] | select(.reviewer==$email)')
+    if [ ! -z "$RESULT" ]; then
+      REVIEW_ID=$(echo $RESULT | jq '.id' | sed 's/"//g')
+      spec_del_review $REVIEW_ID
+      echo "\tRemoved eco review from "$EMAIL" ("$REVIEW_ID")."
+    fi
+  done
+
+  spec_add_review $SPEC_ID $ASSIGN_TO
+  echo "\tAdded "$ASSIGN_TO" as a required reviewer."
+}
+
+spec_all_overwrite_eco_reviewers_with () {
+  IDS=($(curl -X 'GET' \
+    'https://data-products.securetempus.com/v3/data-product-specs?limit=100&status=REVIEW' \
+    -H 'Authorization: Bearer '$(token_prd) \
+    | jq '.items[] | .id' \
+    | sed 's/"//g'))
+
+  for ID in ${IDS[@]}; do
+    spec_overwrite_eco_reviewers_with $ID $1
+  done
+}
+
+policy_access_for_value () {
+
 }
 
 export PATH="${PATH}:${HOME}/dev/home_bins/google-cloud-sdk/bin"
