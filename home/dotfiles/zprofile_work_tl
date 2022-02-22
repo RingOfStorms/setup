@@ -152,7 +152,31 @@ dps_sql_prd () {
     -H 'Content-Type: application/json' \
     -d ${QUERY})
   echo ${RESPONSE}
-  echo ${RESPONSE} | jq '.queryResponse | del(._types, ._parsers)'
+  echo ${RESPONSE} | jq '.queryResponse | del(._types, ._parsers, .fields)'
+}
+
+dps_sql_stg () {
+  QUERY=$(node -e "console.log(JSON.stringify({rawQueryString:process.argv[1]}))" "$@")
+  RESPONSE=$(curl -X 'PATCH' \
+    'https://data-products.stagingtempus.com/database/adHocSQLQuery' \
+    -H 'accept: application/json' \
+    -H 'Authorization: Bearer '$(token_bet) \
+    -H 'Content-Type: application/json' \
+    -d ${QUERY})
+  echo ${RESPONSE}
+  echo ${RESPONSE} | jq '.queryResponse | del(._types, ._parsers, .fields)'
+}
+
+dps_sql_dev () {
+  QUERY=$(node -e "console.log(JSON.stringify({rawQueryString:process.argv[1]}))" "$@")
+  RESPONSE=$(curl -X 'PATCH' \
+    'https://data-products.devtempus.com/database/adHocSQLQuery' \
+    -H 'accept: application/json' \
+    -H 'Authorization: Bearer '$(token_alp) \
+    -H 'Content-Type: application/json' \
+    -d ${QUERY})
+  echo ${RESPONSE}
+  echo ${RESPONSE} | jq '.queryResponse | del(._types, ._parsers, .fields)'
 }
 
 putdp () {
@@ -202,25 +226,51 @@ spec_overwrite_eco_reviewers_with () {
   else
     ASSIGN_TO="$2"
   fi
-  ECO_TEAM=("aaron.zipursky@tempus.com" "gregory.block@tempus.com" "jesse.shellabarger@tempus.com" "varun.nandu@tempus.com" "joshua.bell@tempus.com" "khalid.ahmed@tempus.com" "udayarc.reddy@tempus.com")
-  PENDING_REVIEWERS=$(spec_get_reviewers $SPEC_ID | jq '[.items[] | select(.reviewStatus=="PENDING")]')
+  ECO_TEAM=("test.eco.script@tempus.com" "aaron.zipursky@tempus.com" "gregory.block@tempus.com" "jesse.shellabarger@tempus.com" "varun.nandu@tempus.com" "joshua.bell@tempus.com" "khalid.ahmed@tempus.com" "udayarc.reddy@tempus.com")
+  ALL_REVIEWERS=$(spec_get_reviewers $SPEC_ID | jq '.items')
+  PENDING_REVIEWERS=$(echo $ALL_REVIEWERS | jq '[.[] | select(.reviewStatus=="PENDING")]')
 
   echo "Editing reviewers for spec "$SPEC_ID":"
+  # echo "\tCurrent reviewers:"$ALL_REVIEWERS
+  # echo "\tPending reviewers:"$PENDING_REVIEWERS
 
-  for EMAIL in ${ECO_TEAM[@]}; do
-    RESULT=$(echo $PENDING_REVIEWERS | jq --arg email "$EMAIL" '.[] | select(.reviewer==$email)')
-    if [ ! -z "$RESULT" ]; then
-      REVIEW_ID=$(echo $RESULT | jq '.id' | sed 's/"//g')
-      spec_del_review $REVIEW_ID
-      echo "\tRemoved eco review from "$EMAIL" ("$REVIEW_ID")."
+  if [ ! -z "$PENDING_REVIEWERS" ]; then
+    # echo "Checking eco team...."
+    for EMAIL in ${ECO_TEAM[@]}; do
+      RESULT=$(echo $PENDING_REVIEWERS | jq --arg email "$EMAIL" '.[] | select(.reviewer==$email)')
+      if [ ! -z "$RESULT" ]; then
+        REVIEW_ID=$(echo $RESULT | jq '.id' | sed 's/"//g')
+        spec_del_review $REVIEW_ID
+        echo "\tRemoved eco review from "$EMAIL" ("$REVIEW_ID")."
+      fi
+    done
+
+    ALREADY_APPROVED=$(echo $ALL_REVIEWERS | jq --arg email "$ASSIGN_TO" '.[] | select(.reviewStatus=="APPROVED" and .reviewer==$email)')
+    if [ -z "$ALREADY_APPROVED" ]; then
+      spec_add_review $SPEC_ID $ASSIGN_TO
+      echo "\tAdded "$ASSIGN_TO" as a required reviewer."
+    else
+      echo "Already approved by "$ASSIGN_TO"."
     fi
-  done
-
-  spec_add_review $SPEC_ID $ASSIGN_TO
-  echo "\tAdded "$ASSIGN_TO" as a required reviewer."
+  else
+    echo "Skipping... current reviewers is empty. Manually add yourself with command `spec_add_review #SPEC_ID $ASSIGN_TO`"
+  fi
 }
 
 spec_all_overwrite_eco_reviewers_with () {
+  if [ -z "$1" ]; then
+    ASSIGN_TO=$(decode_jwt $(token_bet) | jq '.sub' | sed 's/"//g')
+  else
+    ASSIGN_TO="$1"
+  fi
+
+  # Set main reviewer for new specs to new person
+  curl -X 'PATCH' \
+    'https://data-products.securetempus.com/private/environment-variables/REQUIRED_SPEC_REVIEWER_EMAIL' \
+    -H 'Authorization: Bearer '$(token_prd) \
+    -H 'Content-Type: application/json' \
+    -d '{ "value": "'$ASSIGN_TO'" }'
+
   IDS=($(curl -X 'GET' \
     'https://data-products.securetempus.com/v3/data-product-specs?limit=100&status=REVIEW' \
     -H 'Authorization: Bearer '$(token_prd) \
