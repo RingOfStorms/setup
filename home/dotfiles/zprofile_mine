@@ -9,6 +9,8 @@ Git config --global core.config ~/.gitconfig
 alias ll="ls -al"
 alias la="ls -A"
 alias psg='ps aux | grep -v "grep" | grep'
+alias pwdc='pwd | pbcopy'
+alias cdp='cd $(pbpaste)'
 # OSX
 alias caff="caffeinate -di &!"
 # SQL | POSTGRES
@@ -170,6 +172,11 @@ pack () {
 
 rm_node_modules () {
   find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +
+}
+
+usenvm () {
+  nvm install $(cat .nvmrc) &> /dev/null
+  echo "node: "$(node --version)" nvmrc: "$(head -n1 .nvmrc)
 }
 
 export NVM_DIR="$HOME/.nvm"

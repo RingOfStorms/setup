@@ -34,7 +34,8 @@ tam () {
 
 ssample () {
   RET=$(pwd)
-  cd ~/tempus/dps-sdk_ts; npx ts-node examples/service/sampleBetas.ts $@; cd $RET
+  echo Sampling $(pbpaste)...
+  cd ~/tempus/dps-sdk_ts; npx ts-node examples/service/sampleBetas.ts $(pbpaste); cd $RET
 }
 
 killt () {
@@ -155,6 +156,18 @@ dps_sql_prd () {
   echo ${RESPONSE} | jq '.queryResponse | del(._types, ._parsers, .fields)'
 }
 
+dps_sql_val () {
+  QUERY=$(node -e "console.log(JSON.stringify({rawQueryString:process.argv[1]}))" "$@")
+  RESPONSE=$(curl -X 'PATCH' \
+    'https://data-products.val.gcp.tempus.cloud/database/adHocSQLQuery' \
+    -H 'accept: application/json' \
+    -H 'Authorization: Bearer '$(token_vld) \
+    -H 'Content-Type: application/json' \
+    -d ${QUERY})
+  echo ${RESPONSE}
+  echo ${RESPONSE} | jq '.queryResponse | del(._types, ._parsers, .fields)'
+}
+
 dps_sql_stg () {
   QUERY=$(node -e "console.log(JSON.stringify({rawQueryString:process.argv[1]}))" "$@")
   RESPONSE=$(curl -X 'PATCH' \
@@ -173,6 +186,18 @@ dps_sql_dev () {
     'https://data-products.devtempus.com/database/adHocSQLQuery' \
     -H 'accept: application/json' \
     -H 'Authorization: Bearer '$(token_alp) \
+    -H 'Content-Type: application/json' \
+    -d ${QUERY})
+  echo ${RESPONSE}
+  echo ${RESPONSE} | jq '.queryResponse | del(._types, ._parsers, .fields)'
+}
+
+dps_sql_zro () {
+  QUERY=$(node -e "console.log(JSON.stringify({rawQueryString:process.argv[1]}))" "$@")
+  RESPONSE=$(curl -X 'PATCH' \
+    'https://data-products-sub-dev.devtempus.com/database/adHocSQLQuery' \
+    -H 'accept: application/json' \
+    -H 'Authorization: Bearer '$(token_zro) \
     -H 'Content-Type: application/json' \
     -d ${QUERY})
   echo ${RESPONSE}
@@ -236,6 +261,14 @@ spec_overwrite_eco_reviewers_with () {
 
   if [ ! -z "$PENDING_REVIEWERS" ]; then
     # echo "Checking eco team...."
+    ALREADY_APPROVED=$(echo $ALL_REVIEWERS | jq --arg email "$ASSIGN_TO" '.[] | select(.reviewStatus=="APPROVED" and .reviewer==$email)')
+    if [ -z "$ALREADY_APPROVED" ]; then
+      spec_add_review $SPEC_ID $ASSIGN_TO
+      echo "\tAdded "$ASSIGN_TO" as a required reviewer."
+    else
+      echo "Already approved by "$ASSIGN_TO"."
+    fi
+
     for EMAIL in ${ECO_TEAM[@]}; do
       RESULT=$(echo $PENDING_REVIEWERS | jq --arg email "$EMAIL" '.[] | select(.reviewer==$email)')
       if [ ! -z "$RESULT" ]; then
@@ -244,14 +277,6 @@ spec_overwrite_eco_reviewers_with () {
         echo "\tRemoved eco review from "$EMAIL" ("$REVIEW_ID")."
       fi
     done
-
-    ALREADY_APPROVED=$(echo $ALL_REVIEWERS | jq --arg email "$ASSIGN_TO" '.[] | select(.reviewStatus=="APPROVED" and .reviewer==$email)')
-    if [ -z "$ALREADY_APPROVED" ]; then
-      spec_add_review $SPEC_ID $ASSIGN_TO
-      echo "\tAdded "$ASSIGN_TO" as a required reviewer."
-    else
-      echo "Already approved by "$ASSIGN_TO"."
-    fi
   else
     echo "Skipping... current reviewers is empty. Manually add yourself with command `spec_add_review #SPEC_ID $ASSIGN_TO`"
   fi
