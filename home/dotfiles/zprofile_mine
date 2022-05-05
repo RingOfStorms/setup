@@ -25,7 +25,7 @@ alias sr='screen -r'
 alias sls='screen -ls'
 # GIT
 alias stash='git stash'
-alias pop'git stash pop'
+alias pop='git stash pop'
 alias branch='git checkout -b'
 alias status='git status'
 alias diff='git diff'

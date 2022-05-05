@@ -19,112 +19,34 @@ paper_latest () {
   curl -o paper.jar https://papermc.io/api/v1/paper/1.16.4/latest/download
 }
 
-joeb_remote () {
-  joeb_remote_down
-  sshfs joeb:/home/josh/projects/mcservers ~/Desktop/mc_remote -o volname=joeb_remote
-}
-
-joeb_remote_root () {
-  joeb_remote_down
-  sshfs joeb:/ ~/Desktop/mc_remote -o volname=joeb_remote
-}
-
-joeb_remote_down() {
+remote_down () {
   diskutil umount force ~/Desktop/mc_remote > /dev/null
   rm -rf ~/Desktop/mc_remote
 }
 
-joebr_remote () {
-  joebr_remote_down
-  sshfs joebr:/home/josh/projects/mcservers ~/Desktop/mc_remote -o volname=joebr_remote
-}
+remote_mount () {
+  remote_down
 
-joebr_remote_root () {
-  joebr_remote_down
-  sshfs joebr:/ ~/Desktop/mc_remote -o volname=joebr_remote
-}
-
-joebr_remote_down() {
-  diskutil umount force ~/Desktop/mc_remote > /dev/null
-  rm -rf ~/Desktop/mc_remote
-}
-
-joe_remote () {
-  joe_remote_down
-  sshfs joe:/projects/mcservers ~/Desktop/mc_remote -o volname=joe_remote
-}
-
-joe_remote_root () {
-  joe_remote_down
-  sshfs joe:/ ~/Desktop/mc_remote -o volname=joe_remote
-}
-
-joe_remote_down() {
-  diskutil umount force ~/Desktop/mc_remote > /dev/null
-  rm -rf ~/Desktop/mc_remote
-}
-
-joer_remote () {
-  joer_remote_down
-  sshfs joer:/home/josh/projects/minecraft-servers ~/Desktop/mc_remote -o volname=joer_remote
-}
-
-joer_remote_root () {
-  joe_remote_down
-  sshfs joer:/ ~/Desktop/mc_remote -o volname=joer_remote
-}
-
-joer_remote_down() {
-  diskutil umount force ~/Desktop/mc_remote > /dev/null
-  rm -rf ~/Desktop/mc_remote
-}
-
-l_remote () {
-  l_remote_down
-  sshfs l:/home/josh/Desktop ~/Desktop/mc_remote -o volname=l_remote
-}
-
-l_remote_down() {
-  diskutil umount force ~/Desktop/mc_remote > /dev/null
-  rm -rf ~/Desktop/mc_remote
-}
-
-rl_remote () {
-  rl_remote_down
-  sshfs rl:/home/josh/Desktop ~/Desktop/mc_remote -o volname=rl_remote
-}
-
-rl_remote_down() {
-  diskutil umount force ~/Desktop/mc_remote > /dev/null
-  rm -rf ~/Desktop/mc_remote
-}
-
-be_remote () {
-  be_remote_down
-  sshfs be:/root ~/Desktop/be_remote -o volname=be_remote
-}
-
-be_remote_root () {
-  be_remote_down
-  sshfs be:/ ~/Desktop/be_remote -o volname=be_remote
-}
-
-be_remote_down() {
-  diskutil umount force ~/Desktop/be_remote > /dev/null
-  rm -rf ~/Desktop/be_remote
-}
-
-be_sync_empires() {
-  rsync -vr be:/root/empires ~/Desktop/be_empires_local --delete-after
-}
-
-d001bjm_remote () {
-  sshfs be:/ ~/Desktop/d001bjm_remote -o volname=d001bjm_remote
-}
-
-d001bjm_remote_down () {
-  diskutil umount force ~/Desktop/d001bjm_remote > /dev/null
-  rm -rf ~/Desktop/d001bjm_remote
+  if [ $1 = "joeb" ]; then
+    echo "Mounting joeb to desktop..."
+    sshfs joeb:/ ~/Desktop/mc_remote -o volname=joeb_remote
+  fi
+  if [ $1 = "joebr" ]; then
+    echo "Mounting joebr to desktop..."
+    sshfs joebr:/ ~/Desktop/mc_remote -o volname=joebr_remote
+  fi
+  if [ $1 = "l" ]; then
+    echo "Mounting l to desktop..."
+    sshfs l:/home/josh/Desktop ~/Desktop/mc_remote -o volname=l_remote
+  fi
+  if [ $1 = "be" ]; then
+    echo "Mounting be to desktop..."
+    sshfs be:/ ~/Desktop/be_remote -o volname=be_remote
+  fi
+  if [ $1 = "d001bjm" ]; then
+    echo "Mounting d001bjm to desktop..."
+    sshfs be:/ ~/Desktop/d001bjm_remote -o volname=d001bjm_remote
+  fi
 }
 
 be_repos () {
@@ -141,16 +63,16 @@ be_repos () {
     echo "Done with $CURRENT...."
   fi
 
-  if [ $1 = "all" ] || [ $1 = "action" ]; then
-    CURRENT=action
-    FILE_CURRENT=$CURRENT
-    cd /Users/joshuabell/projects/block_empires/action
-    echo
-    if [ -z "$3" ]; then figlet Action-lib; fi
-    eval $2
-    echo
-    echo "Done with $CURRENT...."
-  fi
+#  if [ $1 = "all" ] || [ $1 = "action" ]; then
+#    CURRENT=action
+#    FILE_CURRENT=$CURRENT
+#    cd /Users/joshuabell/projects/block_empires/action
+#    echo
+#    if [ -z "$3" ]; then figlet Action-lib; fi
+#    eval $2
+#    echo
+#    echo "Done with $CURRENT...."
+#  fi
 
   if [ $1 = "all" ] || [ $1 = "veh" ]; then
     CURRENT=veh
@@ -163,93 +85,104 @@ be_repos () {
     echo "Done with $CURRENT...."
   fi
 
-  if [ $1 = "all" ] || [ $1 = "spells" ]; then
-    CURRENT=spells
-    FILE_CURRENT=$CURRENT
-    cd /Users/joshuabell/projects/block_empires/spells
+  if [ $1 = "all" ] || [ $1 = "players" ]; then
+    CURRENT=players
+    FILE_CURRENT=JedicraftPlayers
+    cd /Users/joshuabell/projects/block_empires/JedicraftPlayers
     echo
-    if [ -z "$3" ]; then figlet Spells; fi
+    if [ -z "$3" ]; then figlet Players; fi
     eval $2
     echo
     echo "Done with $CURRENT...."
   fi
 
-  if [ $1 = "all" ] || [ $1 = "core" ]; then
-    CURRENT=core
-    FILE_CURRENT=$CURRENT
-    cd /Users/joshuabell/projects/block_empires/core
-    echo
-    if [ -z "$3" ]; then figlet Empires Core; fi
-    eval $2
-    echo
-    echo "Done with $CURRENT...."
-  fi
-
-  if [ $1 = "all" ] || [ $1 = "mobs" ]; then
-    CURRENT=mobs
-    FILE_CURRENT=$CURRENT
-    cd /Users/joshuabell/projects/block_empires/mobs
-    echo
-    if [ -z "$3" ]; then figlet Mobs; fi
-    eval $2
-    echo
-    echo "Done with $CURRENT...."
-  fi
-
-  if [ $1 = "all" ] || [ $1 = "wedit" ]; then
-    CURRENT=wedit
-    FILE_CURRENT=$CURRENT
-    cd /Users/joshuabell/projects/block_empires/wedit
-    echo
-    if [ -z "$3" ]; then figlet WEdit; fi
-    eval $2
-    echo
-    echo "Done with $CURRENT...."
-  fi
-
-  if [ $1 = "all" ] || [ $1 = "chestshop" ]; then
-    CURRENT=chestshop
-    FILE_CURRENT=$CURRENT
-    cd /Users/joshuabell/projects/block_empires/chestshop
-    echo
-    if [ -z "$3" ]; then figlet ChestShop; fi
-    eval $2
-    echo
-    echo "Done with $CURRENT...."
-  fi
-
-  if [ $1 = "all" ] || [ $1 = "structure" ]; then
-    CURRENT=structure
-    FILE_CURRENT=$CURRENT
-    cd /Users/joshuabell/projects/block_empires/structure
-    echo
-    if [ -z "$3" ]; then figlet Structure; fi
-    eval $2
-    echo
-    echo "Done with $CURRENT...."
-  fi
-
-  if [ $1 = "all" ] || [ $1 = "generator" ]; then
-    CURRENT=generator
-    FILE_CURRENT=$CURRENT
-    cd /Users/joshuabell/projects/block_empires/generator
-    echo
-    if [ -z "$3" ]; then figlet Generator; fi
-    eval $2
-    echo
-    echo "Done with $CURRENT...."
-  fi
-
-  if [ $1 = "all" ] || [ $1 = "region" ]; then
-    CURRENT=region
-    FILE_CURRENT=$CURRENT
-    cd /Users/joshuabell/projects/block_empires/region
-    echo
-    if [ -z "$3" ]; then figlet Region; fi
-    eval $2
-    echo
-    echo "Done with $CURRENT...."
-  fi
+#  if [ $1 = "all" ] || [ $1 = "spells" ]; then
+#    CURRENT=spells
+#    FILE_CURRENT=$CURRENT
+#    cd /Users/joshuabell/projects/block_empires/spells
+#    echo
+#    if [ -z "$3" ]; then figlet Spells; fi
+#    eval $2
+#    echo
+#    echo "Done with $CURRENT...."
+#  fi
+#
+#  if [ $1 = "all" ] || [ $1 = "core" ]; then
+#    CURRENT=core
+#    FILE_CURRENT=$CURRENT
+#    cd /Users/joshuabell/projects/block_empires/core
+#    echo
+#    if [ -z "$3" ]; then figlet Empires Core; fi
+#    eval $2
+#    echo
+#    echo "Done with $CURRENT...."
+#  fi
+#
+#  if [ $1 = "all" ] || [ $1 = "mobs" ]; then
+#    CURRENT=mobs
+#    FILE_CURRENT=$CURRENT
+#    cd /Users/joshuabell/projects/block_empires/mobs
+#    echo
+#    if [ -z "$3" ]; then figlet Mobs; fi
+#    eval $2
+#    echo
+#    echo "Done with $CURRENT...."
+#  fi
+#
+#  if [ $1 = "all" ] || [ $1 = "wedit" ]; then
+#    CURRENT=wedit
+#    FILE_CURRENT=$CURRENT
+#    cd /Users/joshuabell/projects/block_empires/wedit
+#    echo
+#    if [ -z "$3" ]; then figlet WEdit; fi
+#    eval $2
+#    echo
+#    echo "Done with $CURRENT...."
+#  fi
+#
+#  if [ $1 = "all" ] || [ $1 = "chestshop" ]; then
+#    CURRENT=chestshop
+#    FILE_CURRENT=$CURRENT
+#    cd /Users/joshuabell/projects/block_empires/chestshop
+#    echo
+#    if [ -z "$3" ]; then figlet ChestShop; fi
+#    eval $2
+#    echo
+#    echo "Done with $CURRENT...."
+#  fi
+#
+#  if [ $1 = "all" ] || [ $1 = "structure" ]; then
+#    CURRENT=structure
+#    FILE_CURRENT=$CURRENT
+#    cd /Users/joshuabell/projects/block_empires/structure
+#    echo
+#    if [ -z "$3" ]; then figlet Structure; fi
+#    eval $2
+#    echo
+#    echo "Done with $CURRENT...."
+#  fi
+#
+#  if [ $1 = "all" ] || [ $1 = "generator" ]; then
+#    CURRENT=generator
+#    FILE_CURRENT=$CURRENT
+#    cd /Users/joshuabell/projects/block_empires/generator
+#    echo
+#    if [ -z "$3" ]; then figlet Generator; fi
+#    eval $2
+#    echo
+#    echo "Done with $CURRENT...."
+#  fi
+#
+#  if [ $1 = "all" ] || [ $1 = "region" ]; then
+#    CURRENT=region
+#    FILE_CURRENT=$CURRENT
+#    cd /Users/joshuabell/projects/block_empires/region
+#    echo
+#    if [ -z "$3" ]; then figlet Region; fi
+#    eval $2
+#    echo
+#    echo "Done with $CURRENT...."
+#  fi
 
   echo
   echo "returning to $RDIR"
