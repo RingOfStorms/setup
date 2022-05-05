@@ -3,18 +3,20 @@ export TEMPUS_TENANT_ID='0066be0c-1687-4fd9-8a95-d8a85cd16a6f'
 
 # Tempus Tokens
 # https://tempus.oktapreview.com/oauth2/ausudtf4sc4dGgLrN0h7
-alias token_zro="okta-personal-token get preview/Tempus-ZRO | tr -d '\n'"
+alias token_zro="okta-personal-token get preview/Tempus-ZRO 2> /dev/null | tr -d '\n'"
 alias tz="token_zro | pbcopy"
-alias token_alp="okta-personal-token get preview/Tempus-ALP | tr -d '\n'"
+alias token_alp="okta-personal-token get preview/Tempus-ALP 2> /dev/null | tr -d '\n'"
 alias ta="token_alp | pbcopy"
-alias token_bet="okta-personal-token get preview/sundial-staging | tr -d '\n'"
+alias token_bet="okta-personal-token get preview/sundial-staging 2> /dev/null | tr -d '\n'"
 alias tb="token_bet | pbcopy"
 alias ts="tb"
-alias token_vld="okta-personal-token get prod/Tempus-VAL | tr -d '\n'"
+alias token_vld="okta-personal-token get prod/Tempus-VAL 2> /dev/null | tr -d '\n'"
 alias tv="token_vld | pbcopy"
-alias token_prd="okta-personal-token get prod/sundial-production | tr -d '\n'"
+alias token_prd="okta-personal-token get prod/sundial-production 2> /dev/null | tr -d '\n'"
 alias tp="token_prd | pbcopy"
 alias vip='vi "+cal cursor(3,18)" -c "startinsert"'
+# Tempus Tacos
+alias tacos='AWS_PROFILE=tempus-science-joshua-bell tacos'
 
 # Tempus Specific
 tam () {
@@ -32,12 +34,16 @@ tam () {
 
 ssample () {
   RET=$(pwd)
-  cd ~/tempus/dps-sdk_ts; npx ts-node examples/service/sampleBetas.ts $@; cd $RET
+  echo Sampling $(pbpaste)...
+  cd ~/tempus/dps-sdk_ts; npx ts-node examples/service/sampleBetas.ts $(pbpaste); cd $RET
 }
 
 killt () {
   sudo launchctl remove com.tanium.taniumclient
   sudo launchctl remove com.crowdstrike.falcond
+  sudo launchctl remove com.cososys.eppclient.launchdaemon
+  sudo launchctl remove application.com.cososys.eppclient.notifier.968123.2041518
+  kill_psg endpointsecurityd
 }
 
 dbaproxy_refresh() {
@@ -138,22 +144,64 @@ tnodequit() {
     done;
 }
 
-lin () {
-  SPEC_TO_LINT=$1 npm run test:nocoverage -- schemas
+dps_sql_prd () {
+  QUERY=$(node -e "console.log(JSON.stringify({rawQueryString:process.argv[1]}))" "$@")
+  RESPONSE=$(curl -X 'PATCH' \
+    'https://data-products.securetempus.com/database/adHocSQLQuery' \
+    -H 'accept: application/json' \
+    -H 'Authorization: Bearer '$(token_prd) \
+    -H 'Content-Type: application/json' \
+    -d ${QUERY})
+  echo ${RESPONSE}
+  echo ${RESPONSE} | jq '.queryResponse | del(._types, ._parsers, .fields)'
 }
 
-lif () {
-  npx ts-node ~/Desktop/scripts/dps/fix_lints.ts ~/tempus/dps/data-product-specs/$1
-  npx prettier schemas data-product-specs/$1 --check --write
-  lin $1
+dps_sql_val () {
+  QUERY=$(node -e "console.log(JSON.stringify({rawQueryString:process.argv[1]}))" "$@")
+  RESPONSE=$(curl -X 'PATCH' \
+    'https://data-products.val.gcp.tempus.cloud/database/adHocSQLQuery' \
+    -H 'accept: application/json' \
+    -H 'Authorization: Bearer '$(token_vld) \
+    -H 'Content-Type: application/json' \
+    -d ${QUERY})
+  echo ${RESPONSE}
+  echo ${RESPONSE} | jq '.queryResponse | del(._types, ._parsers, .fields)'
 }
 
-cl () {
-  git checkout fix_linting
+dps_sql_stg () {
+  QUERY=$(node -e "console.log(JSON.stringify({rawQueryString:process.argv[1]}))" "$@")
+  RESPONSE=$(curl -X 'PATCH' \
+    'https://data-products.stagingtempus.com/database/adHocSQLQuery' \
+    -H 'accept: application/json' \
+    -H 'Authorization: Bearer '$(token_bet) \
+    -H 'Content-Type: application/json' \
+    -d ${QUERY})
+  echo ${RESPONSE}
+  echo ${RESPONSE} | jq '.queryResponse | del(._types, ._parsers, .fields)'
 }
 
-ca () {
-  git checkout fix_linting_ammendments
+dps_sql_dev () {
+  QUERY=$(node -e "console.log(JSON.stringify({rawQueryString:process.argv[1]}))" "$@")
+  RESPONSE=$(curl -X 'PATCH' \
+    'https://data-products.devtempus.com/database/adHocSQLQuery' \
+    -H 'accept: application/json' \
+    -H 'Authorization: Bearer '$(token_alp) \
+    -H 'Content-Type: application/json' \
+    -d ${QUERY})
+  echo ${RESPONSE}
+  echo ${RESPONSE} | jq '.queryResponse | del(._types, ._parsers, .fields)'
+}
+
+dps_sql_zro () {
+  QUERY=$(node -e "console.log(JSON.stringify({rawQueryString:process.argv[1]}))" "$@")
+  RESPONSE=$(curl -X 'PATCH' \
+    'https://data-products-sub-dev.devtempus.com/database/adHocSQLQuery' \
+    -H 'accept: application/json' \
+    -H 'Authorization: Bearer '$(token_zro) \
+    -H 'Content-Type: application/json' \
+    -d ${QUERY})
+  echo ${RESPONSE}
+  echo ${RESPONSE} | jq '.queryResponse | del(._types, ._parsers, .fields)'
 }
 
 putdp () {
@@ -167,3 +215,100 @@ putdp () {
     --data-raw "test data ${date}"
 }
 
+spec_reviews () {
+  curl -X 'GET' \
+    'https://data-products.securetempus.com/v3/data-product-specs?limit=100&status=REVIEW' \
+    -H 'Authorization: Bearer '$(token_prd) \
+    | jq '.items[] | .id + " " + .type + " " + .version + " " + .creator' \
+    | column -t
+}
+
+spec_get_reviewers () {
+  curl -X 'GET' \
+      'https://data-products.securetempus.com/v3/data-product-specs/'$1'/reviews?limit=100' \
+      -H 'Authorization: Bearer '$(token_prd)
+}
+
+spec_del_review () {
+  curl -X 'DELETE' \
+       'https://data-products.securetempus.com/v3/data-product-specs/review/'$1 \
+       -H 'Authorization: Bearer '$(token_prd)
+}
+
+spec_add_review () {
+  curl -X 'POST' \
+     'https://data-products.securetempus.com/v3/data-product-specs/review' \
+     -H 'Authorization: Bearer '$(token_prd) \
+     -H 'Content-Type: application/json' \
+     -d '{"dataProductSpecId": "'$1'","reviewGroup": "REQUIRED","reviewer": "'$2'"}' \
+     &>/dev/null
+}
+
+spec_overwrite_eco_reviewers_with () {
+  SPEC_ID=$1
+  if [ -z "$2" ]; then
+    ASSIGN_TO=$(decode_jwt $(token_bet) | jq '.sub' | sed 's/"//g')
+  else
+    ASSIGN_TO="$2"
+  fi
+  ECO_TEAM=("test.eco.script@tempus.com" "aaron.zipursky@tempus.com" "gregory.block@tempus.com" "jesse.shellabarger@tempus.com" "varun.nandu@tempus.com" "joshua.bell@tempus.com" "khalid.ahmed@tempus.com" "udayarc.reddy@tempus.com")
+  ALL_REVIEWERS=$(spec_get_reviewers $SPEC_ID | jq '.items')
+  PENDING_REVIEWERS=$(echo $ALL_REVIEWERS | jq '[.[] | select(.reviewStatus=="PENDING")]')
+
+  echo "Editing reviewers for spec "$SPEC_ID":"
+  # echo "\tCurrent reviewers:"$ALL_REVIEWERS
+  # echo "\tPending reviewers:"$PENDING_REVIEWERS
+
+  if [ ! -z "$PENDING_REVIEWERS" ]; then
+    # echo "Checking eco team...."
+    ALREADY_APPROVED=$(echo $ALL_REVIEWERS | jq --arg email "$ASSIGN_TO" '.[] | select(.reviewStatus=="APPROVED" and .reviewer==$email)')
+    if [ -z "$ALREADY_APPROVED" ]; then
+      spec_add_review $SPEC_ID $ASSIGN_TO
+      echo "\tAdded "$ASSIGN_TO" as a required reviewer."
+    else
+      echo "Already approved by "$ASSIGN_TO"."
+    fi
+
+    for EMAIL in ${ECO_TEAM[@]}; do
+      RESULT=$(echo $PENDING_REVIEWERS | jq --arg email "$EMAIL" '.[] | select(.reviewer==$email)')
+      if [ ! -z "$RESULT" ]; then
+        REVIEW_ID=$(echo $RESULT | jq '.id' | sed 's/"//g')
+        spec_del_review $REVIEW_ID
+        echo "\tRemoved eco review from "$EMAIL" ("$REVIEW_ID")."
+      fi
+    done
+  else
+    echo "Skipping... current reviewers is empty. Manually add yourself with command `spec_add_review #SPEC_ID $ASSIGN_TO`"
+  fi
+}
+
+spec_all_overwrite_eco_reviewers_with () {
+  if [ -z "$1" ]; then
+    ASSIGN_TO=$(decode_jwt $(token_bet) | jq '.sub' | sed 's/"//g')
+  else
+    ASSIGN_TO="$1"
+  fi
+
+  # Set main reviewer for new specs to new person
+  curl -X 'PATCH' \
+    'https://data-products.securetempus.com/private/environment-variables/REQUIRED_SPEC_REVIEWER_EMAIL' \
+    -H 'Authorization: Bearer '$(token_prd) \
+    -H 'Content-Type: application/json' \
+    -d '{ "value": "'$ASSIGN_TO'" }'
+
+  IDS=($(curl -X 'GET' \
+    'https://data-products.securetempus.com/v3/data-product-specs?limit=100&status=REVIEW' \
+    -H 'Authorization: Bearer '$(token_prd) \
+    | jq '.items[] | .id' \
+    | sed 's/"//g'))
+
+  for ID in ${IDS[@]}; do
+    spec_overwrite_eco_reviewers_with $ID $1
+  done
+}
+
+policy_access_for_value () {
+
+}
+
+export PATH="${PATH}:${HOME}/dev/home_bins/google-cloud-sdk/bin"
