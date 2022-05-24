@@ -17,16 +17,17 @@ alias tp="token_prd | pbcopy"
 alias vip='vi "+cal cursor(3,18)" -c "startinsert"'
 # Tempus Tacos
 alias tacos='AWS_PROFILE=tempus-science-joshua-bell tacos'
+# Transform Hub
+alias thcl=/Users/joshua.bell/.nvm/versions/node/v16.13.1/bin/thcl
+alias dps_sql_bet=dps_sql_stg
 
 # Tempus Specific
 tam () {
   if [[ $1 = "update" && $2 = "all" ]]; then
     echo "updating all tam apps"
-    tam update tam
-    tam update business-time
-    tam update ctv
-    tam update okta-personal-token
-    tam update tacos
+    for app in $(tam list | grep ✅ | cut -d' ' -f2); do
+      tam update $app
+    done
   else
     command tam $@
   fi
@@ -39,11 +40,14 @@ ssample () {
 }
 
 killt () {
-  sudo launchctl remove com.tanium.taniumclient
-  sudo launchctl remove com.crowdstrike.falcond
-  sudo launchctl remove com.cososys.eppclient.launchdaemon
-  sudo launchctl remove application.com.cososys.eppclient.notifier.968123.2041518
+  kill_ctl tanium
+  kill_ctl crowdstrike
+  kill_ctl airwatch
+  kill_ctl eppclient
+  kill_ctl ManagedClient
   kill_psg endpointsecurityd
+  kill_psg ManagedClient
+  kill_psg crowdstrike
 }
 
 dbaproxy_refresh() {
@@ -141,7 +145,7 @@ tnodequit() {
     echo 'Killing: '${PIDS}
     for pid in ${PIDS}; do
       kill -9 ${pid} &> /dev/null
-    done;
+    done
 }
 
 dps_sql_prd () {
@@ -202,6 +206,19 @@ dps_sql_zro () {
     -d ${QUERY})
   echo ${RESPONSE}
   echo ${RESPONSE} | jq '.queryResponse | del(._types, ._parsers, .fields)'
+}
+
+dps_sql_all () {
+  echo PROD
+  dps_sql_prd $@
+  echo VAL
+  dps_sql_val $@
+  echo BETA
+  dps_sql_bet $@
+  echo DEV
+  dps_sql_dev $@
+  echo ZERO
+  dps_sql_zro $@
 }
 
 putdp () {
@@ -290,11 +307,11 @@ spec_all_overwrite_eco_reviewers_with () {
   fi
 
   # Set main reviewer for new specs to new person
-  curl -X 'PATCH' \
-    'https://data-products.securetempus.com/private/environment-variables/REQUIRED_SPEC_REVIEWER_EMAIL' \
+  curl -X 'PUT' \
+    'https://data-products.securetempus.com/private/environment-variables' \
     -H 'Authorization: Bearer '$(token_prd) \
     -H 'Content-Type: application/json' \
-    -d '{ "value": "'$ASSIGN_TO'" }'
+    -d '{ "name": "DPS_SPEC_REQUIRED_REVIEWER_EMAIL", "value": "'$ASSIGN_TO'" }'
 
   IDS=($(curl -X 'GET' \
     'https://data-products.securetempus.com/v3/data-product-specs?limit=100&status=REVIEW' \
@@ -305,10 +322,6 @@ spec_all_overwrite_eco_reviewers_with () {
   for ID in ${IDS[@]}; do
     spec_overwrite_eco_reviewers_with $ID $1
   done
-}
-
-policy_access_for_value () {
-
 }
 
 export PATH="${PATH}:${HOME}/dev/home_bins/google-cloud-sdk/bin"
