@@ -20,7 +20,7 @@ alias sql="sql8_0"
 alias psql11='docker exec -it postgres11 psql -Upostgres'
 alias psql12='docker exec -it postgres12 psql -Upostgres'
 alias psql14='docker exec -it postgres14 psql -Upostgres'
-alias psql='psql12'
+alias psql='psql14'
 # SCREEN
 alias s='screen'
 alias sx='screen -x'
