@@ -21,6 +21,9 @@ alias psql11='docker exec -it postgres11 psql -Upostgres'
 alias psql12='docker exec -it postgres12 psql -Upostgres'
 alias psql14='docker exec -it postgres14 psql -Upostgres'
 alias psql='psql14'
+alias mongo4_4="docker exec -it mongo4_4 mongo --username admin --password password"
+alias mongo5_0="docker exec -it mongo5_0 mongo --username admin --password password"
+alias mongo=mongo5_0
 # SCREEN
 alias s='screen'
 alias sx='screen -x'
@@ -40,6 +43,7 @@ alias c='cargo'
 alias k='kubectl'
 # [[n]v]im
 alias n=nvim
+alias code=vim -u ~/setup/home/config/
 # docker
 alias d='docker'
 alias dr='docker image rm'

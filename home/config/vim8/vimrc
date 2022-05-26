@@ -1,0 +1,40 @@
+" Leader
+let mapleader = " "
+
+" Show line numbers
+set number
+set title
+set shell=zsh\ -li
+" set titlestring="%{ }"
+
+" Keybindings for split screen to move between screens with ctrl
+nnoremap <C-H> <C-W>h
+nnoremap <C-L> <C-W>l
+nnoremap <C-J> <C-W>j
+nnoremap <C-K> <C-W>k
+
+" Keybinding for increasing or decreasing the current screen's width
+noremap <leader>> :10winc ><cr>
+noremap <leader>< :10winc <<cr>
+" noremap <C-i> :10winc +<cr>
+" noremap <C-u> :10winc -<cr>
+
+" Fowrad and back using cmd + [ or cmd + ]
+noremap <C-[> <C-o>
+noremap <C-]> <C-I>
+
+" Keep undo history across sessions by storing it in a file
+if has('persistent_undo')
+    silent !mkdir ~/.config/.vim_undo > /dev/null 2>&1
+    set undodir=~/.config/.vim_undo
+    set undofile
+    set undolevels=1001
+endif
+
+" Tab default to 2 spaces
+set tabstop=2
+set softtabstop=-1
+set shiftwidth=0
+set expandtab
+set autoindent
+
