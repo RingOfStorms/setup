@@ -152,6 +152,14 @@ kill_port() {
   done;
 }
 
+kill_ctl () {
+    daemons=$(sudo launchctl list | grep -v "grep" | grep ${1} | awk '{print $3}')
+    for daemon in ${daemons}; do
+      echo Quitting ${daemon}
+      sudo launchctl remove ${daemon} &> /dev/null
+    done;
+}
+
 kill_psg() {
   if [[ $1 == "tnode" ]]; then
     tnodequit
