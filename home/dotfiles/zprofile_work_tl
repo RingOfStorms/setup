@@ -45,9 +45,9 @@ killt () {
   kill_ctl airwatch
   kill_ctl eppclient
   kill_ctl ManagedClient
-  kill_psg endpointsecurityd
-  kill_psg ManagedClient
-  kill_psg crowdstrike
+  skill_psg endpointsecurityd
+  skill_psg ManagedClient
+  skill_psg crowdstrike
 }
 
 dbaproxy_refresh() {

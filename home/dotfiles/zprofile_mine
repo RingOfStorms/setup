@@ -161,15 +161,19 @@ kill_ctl () {
 }
 
 kill_psg() {
-  if [[ $1 == "tnode" ]]; then
-    tnodequit
-    exit
-  fi
 
   PIDS=$(ps aux | grep -v "grep" | grep ${1} | awk '{print $2}')
   echo Quitting ${PIDS}
   for pid in ${PIDS}; do
     kill -9 ${pid} &> /dev/null
+  done;
+}
+
+skill_psg() {
+  PIDS=$(ps aux | grep -v "grep" | grep ${1} | awk '{print $2}')
+  echo Quitting ${PIDS}
+  for pid in ${PIDS}; do
+    sudo kill -9 ${pid} &> /dev/null
   done;
 }
 
@@ -195,9 +199,9 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
-if [ -f $(brew --prefix)/etc/bash_completion ]; then
-    . $(brew --prefix)/etc/bash_completion
-fi
+#if [ -f $(brew --prefix)/etc/bash_completion ]; then
+#    . $(brew --prefix)/etc/bash_completion
+#fi
 
 # Rust
 export PATH="${HOME}/.cargo/bin:${PATH}"
