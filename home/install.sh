@@ -65,6 +65,12 @@ else
   fi
 fi
 
+# postgres
+echo
+FILE=~/.psqlrc
+confirm_file_del $FILE
+copy_if_ne $FILE $SCRIPT_DIR/dotfiles/psqlrc
+
 # zshenv
 #echo # i dont remember why I added this here, is it copy pasta?
 #FILE=~/.zshrc
