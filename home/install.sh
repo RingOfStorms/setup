@@ -51,17 +51,17 @@ confirm_file_del ~/.zprofile
 touch ~/.zprofile
 if ! grep -q zprofile_mine ~/.zprofile; then
   echo "sourcing custom zprofile..."
-  echo "\nsource "$SCRIPT_DIR"/dotfiles/zprofile_mine" >> ~/.zprofile
+  echo "source "$SCRIPT_DIR"/dotfiles/zprofile_mine" >> ~/.zprofile
 fi
 if [[ $IS_WORK == 0 ]]; then
   if ! grep -q zprofile_work_tl ~/.zprofile; then
     yes_or_no "Source custom zprofile work tl?" && \
-      echo "\nsource "$SCRIPT_DIR"/dotfiles/zprofile_work_tl" >> ~/.zprofile
+      echo "source "$SCRIPT_DIR"/dotfiles/zprofile_work_tl" >> ~/.zprofile
   fi
 else
   if ! grep -q zprofile_mine_mbp ~/.zprofile; then
     yes_or_no "Source custom zprofile mine mbp?" && \
-      echo "\nsource "$SCRIPT_DIR"/dotfiles/zprofile_mine_mbp" >> ~/.zprofile
+      echo "source "$SCRIPT_DIR"/dotfiles/zprofile_mine_mbp" >> ~/.zprofile
   fi
 fi
 

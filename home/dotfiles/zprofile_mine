@@ -3,7 +3,7 @@ export LSCOLORS=gxBxhxDxfxhxhxhxhxcxcx
 
 git config --global core.pager cat
 git config --global core.excludesfile ~/.gitignore
-Git config --global core.config ~/.gitconfig
+git config --global core.config ~/.gitconfig
 
 # Unix
 alias ll="ls -al"
