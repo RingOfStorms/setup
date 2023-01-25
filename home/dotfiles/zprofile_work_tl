@@ -41,13 +41,13 @@ ssample () {
 
 killt () {
   kill_ctl tanium
-  kill_ctl crowdstrike
+  # kill_ctl crowdstrike
   kill_ctl airwatch
   kill_ctl eppclient
   kill_ctl ManagedClient
-  kill_psg endpointsecurityd
-  kill_psg ManagedClient
-  kill_psg crowdstrike
+  skill_psg endpointsecurityd
+  skill_psg ManagedClient
+  # skill_psg crowdstrike
 }
 
 dbaproxy_refresh() {
@@ -126,18 +126,47 @@ db_token() {
   echo $TOKEN
 }
 
-rprod() {
-  FROM_PWD=$(pwd)
-  cd ~/Desktop/scripts/dps
-  TOKEN=$(PROD=1 token) npx ts-node reconcile.ts
-  cd $FROM_PWD
+tp_dps_prd () {
+  tsh db login --db-name=prd_data_products_service --db-user=prd-ro@tempus-teleport.iam prd-data-products-replica-5009ee53 &> /dev/null
+  tsh db connect prd-data-products-replica-5009ee53
 }
 
-rstag() {
-  FROM_PWD=$(pwd)
-  cd ~/Desktop/scripts/dps
-  TOKEN=$(token) DOMAIN=stagingtempus npx ts-node reconcile.ts
-  cd $FROM_PWDa
+tp_dps_val () {
+  tsh db login --db-name=val_data_products_service --db-user=val-ro@tempus-teleport.iam val-data-products-replica-151e72a6 &> /dev/null
+  tsh db connect val-data-products-replica-151e72a6
+}
+
+tp_dps_bet () {
+  tsh db login --db-name=bet_data_products_service --db-user=bet-ro@tempus-teleport.iam bet-data-products-replica-a79d96d7 &> /dev/null
+  tsh db connect bet-data-products-replica-a79d96d7
+}
+
+tp_dps_bet_rw () {
+  tsh db login --db-name=bet_data_products_service --db-user=bet-rw-data@tempus-teleport.iam bet-data-products-8ad67add &> /dev/null
+  tsh db connect bet-data-products-8ad67add
+}
+
+tp_dps_alp () {
+  tsh db login --db-name=alp_data_products_service --db-user=alp-ro@tempus-teleport.iam alp-data-products-replica-cb12354d &> /dev/null
+  tsh db connect alp-data-products-replica-cb12354d
+}
+
+tp_dps_zro () {
+  tsh db login --db-name=zro_data_products_service --db-user=zro-ro@tempus-teleport.iam zro-data-products-0a02149e-replica-70cc5036 &> /dev/null
+  tsh db connect zro-data-products-0a02149e-replica-70cc5036
+}
+
+morning () {
+  defaultbrowser chrome
+  read -n 1
+  ctv
+  tsh db login --db-name=prd_data_products_service --db-user=prd-ro@tempus-teleport.iam prd-data-products-replica-5009ee53 &> /dev/null
+  tsh db login --db-name=val_data_products_service --db-user=val-ro@tempus-teleport.iam val-data-products-replica-151e72a6 &> /dev/null
+  tsh db login --db-name=bet_data_products_service --db-user=bet-ro@tempus-teleport.iam bet-data-products-replica-a79d96d7 &> /dev/null
+  tsh db login --db-name=alp_data_products_service --db-user=alp-ro@tempus-teleport.iam alp-data-products-replica-cb12354d &> /dev/null
+  tsh db login --db-name=zro_data_products_service --db-user=zro-ro@tempus-teleport.iam zro-data-products-0a02149e-replica-70cc5036 &> /dev/null
+  # read -n 1
+  defaultbrowser firefox
 }
 
 tnodequit() {
@@ -146,66 +175,6 @@ tnodequit() {
     for pid in ${PIDS}; do
       kill -9 ${pid} &> /dev/null
     done
-}
-
-dps_sql_prd () {
-  QUERY=$(node -e "console.log(JSON.stringify({rawQueryString:process.argv[1]}))" "$@")
-  RESPONSE=$(curl -X 'PATCH' \
-    'https://data-products.securetempus.com/database/adHocSQLQuery' \
-    -H 'accept: application/json' \
-    -H 'Authorization: Bearer '$(token_prd) \
-    -H 'Content-Type: application/json' \
-    -d ${QUERY})
-  echo ${RESPONSE}
-  echo ${RESPONSE} | jq '.queryResponse | del(._types, ._parsers, .fields)'
-}
-
-dps_sql_val () {
-  QUERY=$(node -e "console.log(JSON.stringify({rawQueryString:process.argv[1]}))" "$@")
-  RESPONSE=$(curl -X 'PATCH' \
-    'https://data-products.val.gcp.tempus.cloud/database/adHocSQLQuery' \
-    -H 'accept: application/json' \
-    -H 'Authorization: Bearer '$(token_vld) \
-    -H 'Content-Type: application/json' \
-    -d ${QUERY})
-  echo ${RESPONSE}
-  echo ${RESPONSE} | jq '.queryResponse | del(._types, ._parsers, .fields)'
-}
-
-dps_sql_stg () {
-  QUERY=$(node -e "console.log(JSON.stringify({rawQueryString:process.argv[1]}))" "$@")
-  RESPONSE=$(curl -X 'PATCH' \
-    'https://data-products.stagingtempus.com/database/adHocSQLQuery' \
-    -H 'accept: application/json' \
-    -H 'Authorization: Bearer '$(token_bet) \
-    -H 'Content-Type: application/json' \
-    -d ${QUERY})
-  echo ${RESPONSE}
-  echo ${RESPONSE} | jq '.queryResponse | del(._types, ._parsers, .fields)'
-}
-
-dps_sql_dev () {
-  QUERY=$(node -e "console.log(JSON.stringify({rawQueryString:process.argv[1]}))" "$@")
-  RESPONSE=$(curl -X 'PATCH' \
-    'https://data-products.devtempus.com/database/adHocSQLQuery' \
-    -H 'accept: application/json' \
-    -H 'Authorization: Bearer '$(token_alp) \
-    -H 'Content-Type: application/json' \
-    -d ${QUERY})
-  echo ${RESPONSE}
-  echo ${RESPONSE} | jq '.queryResponse | del(._types, ._parsers, .fields)'
-}
-
-dps_sql_zro () {
-  QUERY=$(node -e "console.log(JSON.stringify({rawQueryString:process.argv[1]}))" "$@")
-  RESPONSE=$(curl -X 'PATCH' \
-    'https://data-products-sub-dev.devtempus.com/database/adHocSQLQuery' \
-    -H 'accept: application/json' \
-    -H 'Authorization: Bearer '$(token_zro) \
-    -H 'Content-Type: application/json' \
-    -d ${QUERY})
-  echo ${RESPONSE}
-  echo ${RESPONSE} | jq '.queryResponse | del(._types, ._parsers, .fields)'
 }
 
 dps_sql_all () {
@@ -241,18 +210,22 @@ spec_reviews () {
 }
 
 spec_get_reviewers () {
+  // arg $1: Spec ID
   curl -X 'GET' \
       'https://data-products.securetempus.com/v3/data-product-specs/'$1'/reviews?limit=100' \
       -H 'Authorization: Bearer '$(token_prd)
 }
 
 spec_del_review () {
+  // arg $1: Review ID
   curl -X 'DELETE' \
        'https://data-products.securetempus.com/v3/data-product-specs/review/'$1 \
        -H 'Authorization: Bearer '$(token_prd)
 }
 
 spec_add_review () {
+  // arg $1: Spec ID
+  // arg $2: User Email
   curl -X 'POST' \
      'https://data-products.securetempus.com/v3/data-product-specs/review' \
      -H 'Authorization: Bearer '$(token_prd) \
@@ -262,13 +235,15 @@ spec_add_review () {
 }
 
 spec_overwrite_eco_reviewers_with () {
+  // arg $1: Spec ID
+  // (optional) arg $2: User Email to assign to, defaults to current email in staging okta token
   SPEC_ID=$1
   if [ -z "$2" ]; then
     ASSIGN_TO=$(decode_jwt $(token_bet) | jq '.sub' | sed 's/"//g')
   else
     ASSIGN_TO="$2"
   fi
-  ECO_TEAM=("test.eco.script@tempus.com" "aaron.zipursky@tempus.com" "gregory.block@tempus.com" "jesse.shellabarger@tempus.com" "varun.nandu@tempus.com" "joshua.bell@tempus.com" "khalid.ahmed@tempus.com" "udayarc.reddy@tempus.com")
+  ECO_TEAM=("test.eco.script@tempus.com" "aaron.zipursky@tempus.com" "gregory.block@tempus.com" "jesse.shellabarger@tempus.com" "varun.nandu@tempus.com" "joshua.bell@tempus.com" "khalid.ahmed@tempus.com" "udayarc.reddy@tempus.com" "gigi.cupp@tempus.com" "jack.sanders@tempus.com")
   ALL_REVIEWERS=$(spec_get_reviewers $SPEC_ID | jq '.items')
   PENDING_REVIEWERS=$(echo $ALL_REVIEWERS | jq '[.[] | select(.reviewStatus=="PENDING")]')
 
@@ -300,6 +275,7 @@ spec_overwrite_eco_reviewers_with () {
 }
 
 spec_all_overwrite_eco_reviewers_with () {
+  // (optional) arg $1: User Email to assign to, defaults to current email in staging okta token
   if [ -z "$1" ]; then
     ASSIGN_TO=$(decode_jwt $(token_bet) | jq '.sub' | sed 's/"//g')
   else
@@ -324,4 +300,14 @@ spec_all_overwrite_eco_reviewers_with () {
   done
 }
 
+# Random
+dfsetup () {
+  export JAVA_HOME=$(ls -d /Library/Java/JavaVirtualMachines/* | grep jdk-11 | head -n1)/Contents/Home
+  java --version
+}
+
 export PATH="${PATH}:${HOME}/dev/home_bins/google-cloud-sdk/bin"
+
+PATH="$(bash --norc -ec 'IFS=:; paths=($PATH); for i in ${!paths[@]}; do if [[ ${paths[i]} == "'/Users/joshua.bell/.pyenv/shims'" ]]; then unset '\''paths[i]'\''; fi; done; echo "${paths[*]}"')"
+export PATH="/Users/joshua.bell/.pyenv/shims:${PATH}"
+command pyenv rehash 2>/dev/null

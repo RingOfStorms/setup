@@ -13,7 +13,7 @@ alias pwdc='pwd | pbcopy'
 alias cdp='cd $(pbpaste)'
 # OSX
 alias caff="caffeinate -di &!"
-# SQL | POSTGRES
+# Databases
 alias sql8_0="docker exec -it mysql8.0 mysql -uroot --password=password"
 alias sql5_6="docker exec -it mysql5.6 mysql -uroot --password=password"
 alias sql="sql8_0"
@@ -25,6 +25,8 @@ alias mongo4_4="docker exec -it mongo4_4 mongo --username admin --password passw
 alias mongo5_0="docker exec -it mongo5_0 mongo --username admin --password password"
 alias mongo5_0="docker exec -it mongo6_0 mongo --username admin --password password"
 alias mongo=mongo6_0
+alias redis6_2="docker exec -it redis6_2 redis-cli"
+alias redis=redis6_2
 # SCREEN
 alias s='screen'
 alias sx='screen -x'
@@ -54,6 +56,12 @@ alias drun='docker run --rm -it -v "${HOME}/.aws:/root/.aws" -v "${HOME}/.ssh:/r
 alias today="watch -c -n 60 icalBuddy -f -n -sd eventsToday"
 # say
 alias say="say -v veena"
+# ripgrep
+alias rg="rg --no-ignore"
+alias rgt="rg --no-ignore -g'!*.test.*' -g'!__mocks__/'"
+# date
+alias date_compact='date +"%Y%m%d"'
+alias date_short='date +"%Y-%m-%d"'
 
 decode_jwt () {
   jq -R 'gsub("-";"+") | gsub("_";"/") | split(".") | .[1] | @base64d | fromjson' <<< $@
@@ -157,20 +165,24 @@ kill_ctl () {
     daemons=$(sudo launchctl list | grep -v "grep" | grep ${1} | awk '{print $3}')
     for daemon in ${daemons}; do
       echo Quitting ${daemon}
-      sudo launchctl remove ${daemon} &> /dev/null
+      sudo launchctl disable ${daemon} &> /dev/null
+      sudo launchctl kill ${daemon} &> /dev/null
     done;
 }
 
 kill_psg() {
-  if [[ $1 == "tnode" ]]; then
-    tnodequit
-    exit
-  fi
-
   PIDS=$(ps aux | grep -v "grep" | grep ${1} | awk '{print $2}')
   echo Quitting ${PIDS}
   for pid in ${PIDS}; do
     kill -9 ${pid} &> /dev/null
+  done;
+}
+
+skill_psg() {
+  PIDS=$(ps aux | grep -v "grep" | grep ${1} | awk '{print $2}')
+  echo Quitting ${PIDS}
+  for pid in ${PIDS}; do
+    sudo kill -9 ${pid} &> /dev/null
   done;
 }
 
@@ -192,13 +204,23 @@ usenvm () {
   echo "node: "$(node --version)" nvmrc: "$(head -n1 .nvmrc)
 }
 
+usepy () {
+  if test -f "bin/activate"; then
+    echo Found venv, activating...
+    source bin/activate
+  else
+    echo No venv found! Using system wide python
+  fi
+  python --version
+}
+
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
-if [ -f $(brew --prefix)/etc/bash_completion ]; then
-    . $(brew --prefix)/etc/bash_completion
-fi
+#if [ -f $(brew --prefix)/etc/bash_completion ]; then
+#    . $(brew --prefix)/etc/bash_completion
+#fi
 
 # Rust
 export PATH="${HOME}/.cargo/bin:${PATH}"
