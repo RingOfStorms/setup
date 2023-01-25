@@ -23,7 +23,8 @@ alias psql14='docker exec -it postgres14 psql -Upostgres'
 alias psql='psql14'
 alias mongo4_4="docker exec -it mongo4_4 mongo --username admin --password password"
 alias mongo5_0="docker exec -it mongo5_0 mongo --username admin --password password"
-alias mongo=mongo5_0
+alias mongo5_0="docker exec -it mongo6_0 mongo --username admin --password password"
+alias mongo=mongo6_0
 alias redis6_2="docker exec -it redis6_2 redis-cli"
 alias redis=redis6_2
 # SCREEN
