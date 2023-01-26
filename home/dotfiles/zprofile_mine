@@ -59,6 +59,9 @@ alias say="say -v veena"
 # ripgrep
 alias rg="rg --no-ignore"
 alias rgt="rg --no-ignore -g'!*.test.*' -g'!__mocks__/'"
+alias rgf="rg --files | rg"
+# IDE
+alias idea="/home/josh/programs/idea-IU-222.4345.14/bin/idea.sh"
 # date
 alias date_compact='date +"%Y%m%d"'
 alias date_short='date +"%Y-%m-%d"'
