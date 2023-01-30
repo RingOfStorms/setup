@@ -175,9 +175,17 @@ kill_ctl () {
 
 kill_psg() {
   PIDS=$(ps aux | grep -v "grep" | grep ${1} | awk '{print $2}')
-  echo Quitting ${PIDS}
+  echo Killing ${PIDS}
   for pid in ${PIDS}; do
     kill -9 ${pid} &> /dev/null
+  done;
+}
+
+term_psg() {
+  PIDS=$(ps aux | grep -v "grep" | grep ${1} | awk '{print $2}')
+  echo Terminating ${PIDS}
+  for pid in ${PIDS}; do
+    kill -15 ${pid} &> /dev/null
   done;
 }
 
