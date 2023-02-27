@@ -6,9 +6,9 @@ git config --global core.excludesfile ~/.gitignore
 git config --global core.config ~/.gitconfig
 
 # Unix
-alias ls="ls -a"
-alias ll="ls -al"
-alias la="ls -A"
+alias ls="ls -Ga"
+alias ll="ls -Gal"
+alias la="ls -GA"
 alias psg='ps aux | grep -v "grep" | grep'
 alias pwdc='pwd | pbcopy'
 alias cdp='cd $(pbpaste)'
