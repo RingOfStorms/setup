@@ -3,7 +3,7 @@ export LSCOLORS=gxBxhxDxfxhxhxhxhxcxcx
 
 git config --global core.pager cat
 git config --global core.excludesfile ~/.gitignore
-Git config --global core.config ~/.gitconfig
+git config --global core.config ~/.gitconfig
 
 # Unix
 alias ls="ls -a"
@@ -24,7 +24,8 @@ alias psql14='docker exec -it postgres14 psql -Upostgres'
 alias psql='psql14'
 alias mongo4_4="docker exec -it mongo4_4 mongo --username admin --password password"
 alias mongo5_0="docker exec -it mongo5_0 mongo --username admin --password password"
-alias mongo=mongo5_0
+alias mongo5_0="docker exec -it mongo6_0 mongo --username admin --password password"
+alias mongo=mongo6_0
 alias redis6_2="docker exec -it redis6_2 redis-cli"
 alias redis=redis6_2
 # SCREEN
@@ -59,6 +60,9 @@ alias say="say -v veena"
 # ripgrep
 alias rg="rg --no-ignore"
 alias rgt="rg --no-ignore -g'!*.test.*' -g'!__mocks__/'"
+alias rgf="rg --files | rg"
+# IDE
+alias idea="/home/josh/programs/idea-IU-222.4345.14/bin/idea.sh"
 # date
 alias date_compact='date +"%Y%m%d"'
 alias date_short='date +"%Y-%m-%d"'
@@ -172,9 +176,17 @@ kill_ctl () {
 
 kill_psg() {
   PIDS=$(ps aux | grep -v "grep" | grep ${1} | awk '{print $2}')
-  echo Quitting ${PIDS}
+  echo Killing ${PIDS}
   for pid in ${PIDS}; do
     kill -9 ${pid} &> /dev/null
+  done;
+}
+
+term_psg() {
+  PIDS=$(ps aux | grep -v "grep" | grep ${1} | awk '{print $2}')
+  echo Terminating ${PIDS}
+  for pid in ${PIDS}; do
+    kill -15 ${pid} &> /dev/null
   done;
 }
 
