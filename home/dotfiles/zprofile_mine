@@ -6,6 +6,7 @@ git config --global core.excludesfile ~/.gitignore
 Git config --global core.config ~/.gitconfig
 
 # Unix
+alias ls="ls -a"
 alias ll="ls -al"
 alias la="ls -A"
 alias psg='ps aux | grep -v "grep" | grep'
@@ -100,7 +101,7 @@ pullmaster () {
 push () {
   B=$(git branch | sed -n -e 's/^\* \(.*\)/\1/p')
   git pull origin $B
-  git push origin $B
+  git push origin $B --no-verify
 }
 
 pull () {
