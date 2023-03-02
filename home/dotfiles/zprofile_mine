@@ -41,7 +41,12 @@ alias diff='git diff'
 alias branches='git branch -a'
 alias gcam='git commit -a -m'
 # CARGO
-alias c='cargo'
+alias c='RUSTC_WRAPPER=sccache cargo'
+alias cf='genemichaels -qp && c +nightly fmt'
+alias cr='c run'
+alias cwr='c watch -x run'
+alias cc='c check'
+alias cwc='c watch -x check'
 # K8s
 alias k='kubectl'
 # [[n]v]im
