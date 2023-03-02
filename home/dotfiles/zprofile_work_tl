@@ -20,6 +20,8 @@ alias tacos='AWS_PROFILE=tempus-science-joshua-bell tacos'
 # Transform Hub
 alias thcl=/Users/joshua.bell/.nvm/versions/node/v16.13.1/bin/thcl
 alias dps_sql_bet=dps_sql_stg
+# Aws cli
+alias aws=/Users/joshua.bell/dev/home_bins/aws-sdk/aws-cli/aws
 
 # Tempus Specific
 tam () {
@@ -156,17 +158,23 @@ tp_dps_zro () {
   tsh db connect zro-data-products-0a02149e-replica-70cc5036
 }
 
+tp_dps_zro_rw () {
+  tsh db login --db-name=zro_data_products_service --db-user=zro-rw-data@tempus-teleport.iam zro-data-products-0a02149e &> /dev/null
+  tsh db connect zro-data-products-0a02149e
+}
+
 morning () {
-  defaultbrowser chrome
-  read -n 1
+  # defaultbrowser chrome
+  # read -n 1
   ctv
   tsh db login --db-name=prd_data_products_service --db-user=prd-ro@tempus-teleport.iam prd-data-products-replica-5009ee53 &> /dev/null
   tsh db login --db-name=val_data_products_service --db-user=val-ro@tempus-teleport.iam val-data-products-replica-151e72a6 &> /dev/null
   tsh db login --db-name=bet_data_products_service --db-user=bet-ro@tempus-teleport.iam bet-data-products-replica-a79d96d7 &> /dev/null
   tsh db login --db-name=alp_data_products_service --db-user=alp-ro@tempus-teleport.iam alp-data-products-replica-cb12354d &> /dev/null
   tsh db login --db-name=zro_data_products_service --db-user=zro-ro@tempus-teleport.iam zro-data-products-0a02149e-replica-70cc5036 &> /dev/null
-  # read -n 1
-  defaultbrowser firefox
+  # defaultbrowser firefox
+
+  open https://tempus.service-now.com/hdportal/
 }
 
 tnodequit() {
