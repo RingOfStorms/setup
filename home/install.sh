@@ -89,6 +89,11 @@ FILE=~/.gitconfig
 confirm_file_del $FILE
 copy_if_ne $FILE $SCRIPT_DIR/config/git/gitconfig
 
+# Vim
+# Astro Vim for now
+yes_or_no "Install AstroVim config?" && \
+  git clone https://github.com/AstroNvim/AstroNvim ~/.config/nvim
+
 # vim
   #echo
   #mkdir -p ~/.config/.vim/undodir
