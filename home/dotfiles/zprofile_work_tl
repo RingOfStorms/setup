@@ -19,7 +19,6 @@ alias vip='vi "+cal cursor(3,18)" -c "startinsert"'
 alias tacos='AWS_PROFILE=tempus-science-joshua-bell tacos'
 # Transform Hub
 alias thcl=/Users/joshua.bell/.nvm/versions/node/v16.13.1/bin/thcl
-alias dps_sql_bet=dps_sql_stg
 # Aws cli
 alias aws=/Users/joshua.bell/dev/home_bins/aws-sdk/aws-cli/aws
 
@@ -49,7 +48,7 @@ killt () {
   kill_ctl ManagedClient
   skill_psg endpointsecurityd
   skill_psg ManagedClient
-  # skill_psg crowdstrike
+  # skill_psg crowdstrike # dont do this one security will message you and you will be in trouble
 }
 
 dbaproxy_refresh() {
@@ -164,7 +163,7 @@ tp_dps_zro_rw () {
 }
 
 morning () {
-  # defaultbrowser chrome
+  # defaultbrowser chrome # ! teleport supports firefox now so dont need this anymore !
   # read -n 1
   ctv
   tsh db login --db-name=prd_data_products_service --db-user=prd-ro@tempus-teleport.iam prd-data-products-replica-5009ee53 &> /dev/null
@@ -174,7 +173,8 @@ morning () {
   tsh db login --db-name=zro_data_products_service --db-user=zro-ro@tempus-teleport.iam zro-data-products-0a02149e-replica-70cc5036 &> /dev/null
   # defaultbrowser firefox
 
-  open https://tempus.service-now.com/hdportal/
+  open https://tempus.service-now.com/hdportal
+  open https://mail.google.com/mail/u/0/#inbox
 }
 
 tnodequit() {
@@ -183,19 +183,6 @@ tnodequit() {
     for pid in ${PIDS}; do
       kill -9 ${pid} &> /dev/null
     done
-}
-
-dps_sql_all () {
-  echo PROD
-  dps_sql_prd $@
-  echo VAL
-  dps_sql_val $@
-  echo BETA
-  dps_sql_bet $@
-  echo DEV
-  dps_sql_dev $@
-  echo ZERO
-  dps_sql_zro $@
 }
 
 putdp () {
@@ -209,105 +196,6 @@ putdp () {
     --data-raw "test data ${date}"
 }
 
-spec_reviews () {
-  curl -X 'GET' \
-    'https://data-products.securetempus.com/v3/data-product-specs?limit=100&status=REVIEW' \
-    -H 'Authorization: Bearer '$(token_prd) \
-    | jq '.items[] | .id + " " + .type + " " + .version + " " + .creator' \
-    | column -t
-}
-
-spec_get_reviewers () {
-  // arg $1: Spec ID
-  curl -X 'GET' \
-      'https://data-products.securetempus.com/v3/data-product-specs/'$1'/reviews?limit=100' \
-      -H 'Authorization: Bearer '$(token_prd)
-}
-
-spec_del_review () {
-  // arg $1: Review ID
-  curl -X 'DELETE' \
-       'https://data-products.securetempus.com/v3/data-product-specs/review/'$1 \
-       -H 'Authorization: Bearer '$(token_prd)
-}
-
-spec_add_review () {
-  // arg $1: Spec ID
-  // arg $2: User Email
-  curl -X 'POST' \
-     'https://data-products.securetempus.com/v3/data-product-specs/review' \
-     -H 'Authorization: Bearer '$(token_prd) \
-     -H 'Content-Type: application/json' \
-     -d '{"dataProductSpecId": "'$1'","reviewGroup": "REQUIRED","reviewer": "'$2'"}' \
-     &>/dev/null
-}
-
-spec_overwrite_eco_reviewers_with () {
-  // arg $1: Spec ID
-  // (optional) arg $2: User Email to assign to, defaults to current email in staging okta token
-  SPEC_ID=$1
-  if [ -z "$2" ]; then
-    ASSIGN_TO=$(decode_jwt $(token_bet) | jq '.sub' | sed 's/"//g')
-  else
-    ASSIGN_TO="$2"
-  fi
-  ECO_TEAM=("test.eco.script@tempus.com" "aaron.zipursky@tempus.com" "gregory.block@tempus.com" "jesse.shellabarger@tempus.com" "varun.nandu@tempus.com" "joshua.bell@tempus.com" "khalid.ahmed@tempus.com" "udayarc.reddy@tempus.com" "gigi.cupp@tempus.com" "jack.sanders@tempus.com")
-  ALL_REVIEWERS=$(spec_get_reviewers $SPEC_ID | jq '.items')
-  PENDING_REVIEWERS=$(echo $ALL_REVIEWERS | jq '[.[] | select(.reviewStatus=="PENDING")]')
-
-  echo "Editing reviewers for spec "$SPEC_ID":"
-  # echo "\tCurrent reviewers:"$ALL_REVIEWERS
-  # echo "\tPending reviewers:"$PENDING_REVIEWERS
-
-  if [ ! -z "$PENDING_REVIEWERS" ]; then
-    # echo "Checking eco team...."
-    ALREADY_APPROVED=$(echo $ALL_REVIEWERS | jq --arg email "$ASSIGN_TO" '.[] | select(.reviewStatus=="APPROVED" and .reviewer==$email)')
-    if [ -z "$ALREADY_APPROVED" ]; then
-      spec_add_review $SPEC_ID $ASSIGN_TO
-      echo "\tAdded "$ASSIGN_TO" as a required reviewer."
-    else
-      echo "Already approved by "$ASSIGN_TO"."
-    fi
-
-    for EMAIL in ${ECO_TEAM[@]}; do
-      RESULT=$(echo $PENDING_REVIEWERS | jq --arg email "$EMAIL" '.[] | select(.reviewer==$email)')
-      if [ ! -z "$RESULT" ]; then
-        REVIEW_ID=$(echo $RESULT | jq '.id' | sed 's/"//g')
-        spec_del_review $REVIEW_ID
-        echo "\tRemoved eco review from "$EMAIL" ("$REVIEW_ID")."
-      fi
-    done
-  else
-    echo "Skipping... current reviewers is empty. Manually add yourself with command `spec_add_review #SPEC_ID $ASSIGN_TO`"
-  fi
-}
-
-spec_all_overwrite_eco_reviewers_with () {
-  // (optional) arg $1: User Email to assign to, defaults to current email in staging okta token
-  if [ -z "$1" ]; then
-    ASSIGN_TO=$(decode_jwt $(token_bet) | jq '.sub' | sed 's/"//g')
-  else
-    ASSIGN_TO="$1"
-  fi
-
-  # Set main reviewer for new specs to new person
-  curl -X 'PUT' \
-    'https://data-products.securetempus.com/private/environment-variables' \
-    -H 'Authorization: Bearer '$(token_prd) \
-    -H 'Content-Type: application/json' \
-    -d '{ "name": "DPS_SPEC_REQUIRED_REVIEWER_EMAIL", "value": "'$ASSIGN_TO'" }'
-
-  IDS=($(curl -X 'GET' \
-    'https://data-products.securetempus.com/v3/data-product-specs?limit=100&status=REVIEW' \
-    -H 'Authorization: Bearer '$(token_prd) \
-    | jq '.items[] | .id' \
-    | sed 's/"//g'))
-
-  for ID in ${IDS[@]}; do
-    spec_overwrite_eco_reviewers_with $ID $1
-  done
-}
-
 # Random
 dfsetup () {
   export JAVA_HOME=$(ls -d /Library/Java/JavaVirtualMachines/* | grep jdk-11 | head -n1)/Contents/Home
@@ -316,6 +204,3 @@ dfsetup () {
 
 export PATH="${PATH}:${HOME}/dev/home_bins/google-cloud-sdk/bin"
 
-PATH="$(bash --norc -ec 'IFS=:; paths=($PATH); for i in ${!paths[@]}; do if [[ ${paths[i]} == "'/Users/joshua.bell/.pyenv/shims'" ]]; then unset '\''paths[i]'\''; fi; done; echo "${paths[*]}"')"
-export PATH="/Users/joshua.bell/.pyenv/shims:${PATH}"
-command pyenv rehash 2>/dev/null
