@@ -43,6 +43,33 @@ function load_nvm {
     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
 }
 
+
+
+if ! command -v rustup &> /dev/null; then
+    echo "Installing rust..."
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+    rustup update stable
+    rustup update nightly
+fi
+
+if ! command -v cargo-binstall &> /dev/null; then
+    echo "Installing cargo binstall..."
+    cargo install cargo-binstall
+fi
+
+if ! command -v rtx &> /dev/null; then
+    echo "Installing rtx..."
+    cargo-binstall rtx-cli
+fi
+
+#RTX_PLUGINS="neovim python age"
+#for plugin in $RTX_PLUGINS; do
+    #if ! rtx plugins | grep $plugin; then
+        #echo "Installing $plugin rtx plugin..."
+        #rtx plugin install $plugin
+    #fi
+#done
+
 yes_or_no "Is work laptop?"
 IS_WORK=$?
 
