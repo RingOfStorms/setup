@@ -41,8 +41,9 @@ alias status='git status'
 alias diff='git diff'
 alias branches='git branch -a'
 alias gcam='git commit -a -m'
-# CARGO
+# CARGO / RUST
 alias c='cargo'
+alias rust='evcxr'
 # K8s
 alias k='kubectl'
 # [[n]v]im
