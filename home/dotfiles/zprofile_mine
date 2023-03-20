@@ -48,6 +48,7 @@ alias cr='c run'
 alias cwr='c watch -x run'
 alias cc='c check'
 alias cwc='c watch -x check'
+alias rust='evcxr'
 # K8s
 alias k='kubectl'
 # [[n]v]im
@@ -74,6 +75,14 @@ alias date_short='date +"%Y-%m-%d"'
 # asdf / rtx
 alias asdf=rtx
 
+htop_psg () {
+  htop -p $(psg $1 | awk '{r=r s $2;s=","} END{print r}')
+}
+
+htop_pid () {
+  htop -p $(ps -ef | awk -v proc=$1 '$3 == proc { cnt++;if (cnt == 1) { printf "%s",$2 } else { printf ",%s",$2 } }')
+}
+
 decode_jwt () {
   jq -R 'gsub("-";"+") | gsub("_";"/") | split(".") | .[1] | @base64d | fromjson' <<< $@
 }
@@ -84,7 +93,7 @@ explain () {
   open https://explainshell.com/explain?cmd=$CMD
 }
 
-# Remarkable
+# Remarkable Screenshot
 resnap () {
 # output_jpg	File to save screenshot to (default resnap.jpg)
 # -v --version	Display version and exit
@@ -240,6 +249,9 @@ export NVM_DIR="$HOME/.nvm"
 #if [ -f $(brew --prefix)/etc/bash_completion ]; then
 #    . $(brew --prefix)/etc/bash_completion
 #fi
+
+# Local bin
+export PATH="${PATH}:${HOME}/.local/bin"
 
 # Rust
 export PATH="${HOME}/.cargo/bin:${PATH}"
