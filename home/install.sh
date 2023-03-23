@@ -119,7 +119,8 @@ copy_if_ne $FILE $SCRIPT_DIR/config/git/gitconfig
 # Vim
 # Astro Vim for now
 yes_or_no "Install AstroVim config?" && \
-  git clone https://github.com/AstroNvim/AstroNvim ~/.config/nvim
+  git clone https://github.com/AstroNvim/AstroNvim ~/.config/nvim && \
+  git clone https://github.com/RingOfStorms/astronvim_config ~/.config/nvim/lua/user
 
 # vim
   #echo
