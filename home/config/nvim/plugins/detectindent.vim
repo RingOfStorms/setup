@@ -1,2 +1,0 @@
-" DetectIndent
-autocmd BufReadPost * :DetectIndent

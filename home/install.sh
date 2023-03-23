@@ -122,47 +122,5 @@ yes_or_no "Install AstroVim config?" && \
   git clone https://github.com/AstroNvim/AstroNvim ~/.config/nvim && \
   git clone https://github.com/RingOfStorms/astronvim_config ~/.config/nvim/lua/user
 
-# vim
-  #echo
-  #mkdir -p ~/.config/.vim/undodir
-  #FILE=~/.vimrc
-  #confirm_file_del $FILE
-  #link_if_ne $FILE $SCRIPT_DIR/config/nvim/vimrc
-
-
-# nvim requirements
-  #echo "TODO NEED TO NOT INSTALL BREW IF LINUX THIS PART WILL FAIL BUT CONTINUE"
-  #if ! (echo -n "brew\t" && brew --version) ; then echo "Installing brew..." && (/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)") fi
-  #if ! (echo -n "nvim\t" && nvim --version) ; then echo "Install nvim..." && (brew --version &> /dev/null && brew install nvim || sudo snap install --beta nvim --classic) fi
-  #if ! (echo -n "fzf\t" && fzf --version) ; then echo "Installing fzf..." && (brew --version &> /dev/null && brew install fzf || sudo apt install fzf) fi
-  #if ! (echo -n "rg\t" && rg --version) ; then echo "Installing rg..." && (brew --version &> /dev/null && brew install rg || sudo apt install ripgrep) fi
-  #if ! (echo -n "curl\t" && curl --version) ; then echo "Installing curl..." && (brew --version &> /dev/null && brew install curl || sudo apt install curl) fi
-  #echo "TODO install FD brew install fd https://github.com/sharkdp/fd#installation"
-  #if ! (load_nvm && nvm --version &> /dev/null); then
-  #  echo "installing nvm..."
-  #  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
-  #  load_nvm
-  #  nvm install --lts
-  #  npm install -g neovim
-  #fi
-  #if ! (echo -n "pyright\t" && npm list -g pyright) ; then echo "Installing pyright..." && npm install -g pyright ;fi
-  #if ! (echo -n "typescript\t" && npm list -g typescript) ; then echo "Installing typescript..." && npm install -g typescript ;fi
-  #if ! (echo -n "typescript-language-server\t" && npm list -g typescript-language-server) ; then echo "Installing typescript-language-server..." && npm install -g typescript-language-server ;fi
-
-
-# nvim settings
-  #mkdir -p ~/.config/nvim
-  #
-  #FILE=~/.config/nvim/init.vim
-  #confirm_file_del $FILE
-  #link_if_ne $FILE $SCRIPT_DIR/config/nvim/init.vim
-  #
-  #FILE=~/.config/nvim/settings
-  #confirm_file_del $FILE
-  #link_if_ne $FILE $SCRIPT_DIR/config/nvim/settings
-  #
-  #nvim --headless +PlugInstall +qall
-  #nvim --headless +TSInstall +qall
-
 # # # # #
 echo done
