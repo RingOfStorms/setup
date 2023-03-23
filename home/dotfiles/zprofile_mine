@@ -6,9 +6,9 @@ git config --global core.excludesfile ~/.gitignore
 git config --global core.config ~/.gitconfig
 
 # Unix
-alias ls="ls -Ga"
-alias ll="ls -Gal"
-alias la="ls -GA"
+alias ls="ls --color -Ga"
+alias ll="ls --color -Gal"
+alias la="ls --color -GA"
 alias psg='ps aux | grep -v "grep" | grep'
 alias pwdc='pwd | pbcopy'
 alias cdp='cd $(pbpaste)'
@@ -74,6 +74,8 @@ alias date_compact='date +"%Y%m%d"'
 alias date_short='date +"%Y-%m-%d"'
 # asdf / rtx
 alias asdf=rtx
+# firefox
+alias firefox="firefox -P </dev/null &>/dev/null &"
 
 htop_psg () {
   htop -p $(psg $1 | awk '{r=r s $2;s=","} END{print r}')
@@ -241,6 +243,9 @@ usepy () {
   fi
   python --version
 }
+
+export VISUAL="nvim"
+export EDITOR="$VISUAL"
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
