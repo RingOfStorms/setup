@@ -6,6 +6,10 @@ export PATH="${HOME}/.local/bin:${PATH}"
 export PATH="${HOME}/.cargo/bin:${PATH}"
 
 # ENV VARS
-source ~/.config/environment/.env
+. ~/.config/environment/.env
+
+if [[ -d "$HOME/.cargo" ]]; then
+  . "$HOME/.cargo/env"
+fi
 
 eval "$(rtx activate zsh)"

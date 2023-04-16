@@ -1,7 +1,8 @@
 # !/bin/sh
 
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
-function yes_or_no {
+SCRIPT_DIR="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+
+yes_or_no() {
     while true; do
         read -p "$* [y/n]: " yn
         case $yn in
@@ -11,27 +12,13 @@ function yes_or_no {
     done
 }
 
-function confirm_file_del {
-  FILE=$1
-  if [[ -f "$FILE" ]]; then
-    yes_or_no "$FILE file already exists. List contents?" && cat $FILE
-    yes_or_no "Delete file so it can be replaced?" && rm -f $FILE || echo "Did not delete file."
-  elif [[ -d "$FILE" ]]; then
-    yes_or_no "$FILE directory already exists. List contents?" && ls -l $FILE
-    yes_or_no "Delete directory so it can be replaced?" && rm -rf $FILE || echo "Did not delete directory."
-  elif [[ -L "$FILE" ]]; then
-    yes_or_no "$FILE link already exists. List contents?" && ls -lh $FILE
-    echo yes_or_no "Delete link so it can be replaced?" && rm -f $FILE || echo "Did not delete link."
-  fi
-}
-
-function link_if_ne {
+link_if_ne() {
   FILE=$1
   SOURCE=$2
   [ ! -f $FILE ] && [ ! -d $FILE ] && [ ! -L $FILE ] && ln -s $SOURCE $FILE && echo " >Linked $SOURCE to $FILE" || echo "| Skipped linking $SOURCE to $FILE"
 }
 
-function copy_if_ne {
+copy_if_ne() {
   FILE=$1
   SOURCE=$2
   cp $SOURCE $FILE
@@ -44,68 +31,72 @@ touch ~/.config/environment/.env
 
 # shell configs
 touch ~/.zshenv
-if ! grep -q zshenv_mine ~/.zshenv; then
-  echo "> adding source for my zshenv..."
-  echo "source "$SCRIPT_DIR"/dotfiles/zshenv_mine" >> ~/.zshenv && \
-  source ~/.zshenv
-fi
+grep -q zshenv_mine ~/.zshenv || {
+  echo "> adding source for my zshenv..." && \
+  echo ". "$SCRIPT_DIR"/dotfiles/zshenv_mine" >> ~/.zshenv 
+}
 
 touch ~/.zprofile
-if ! grep -q zprofile_mine ~/.zprofile; then
-  echo "> adding source for my zprofile..."
-  echo "source "$SCRIPT_DIR"/dotfiles/zprofile_mine" >> ~/.zprofile && \
-  source ~/.zshprofile
-fi
+grep -q zprofile_mine_all ~/.zprofile || { 
+  echo "> adding source for my zprofile all..." && \
+  echo ". "$SCRIPT_DIR"/dotfiles/zprofile_mine_all" >> ~/.zprofile 
+}
 
-if ! grep -q zprofile_work_tl ~/.zprofile; then
+grep -q zprofile_work_tl ~/.zprofile || {
   yes_or_no "? Source custom zprofile work tl?" && \
-    echo "source "$SCRIPT_DIR"/dotfiles/zprofile_work_tl" >> ~/.zprofile && \
-    source ~/.zshprofile
-fi
+    echo ". "$SCRIPT_DIR"/dotfiles/zprofile_work_tl" >> ~/.zprofile 
+}
 
-if ! grep -q zprofile_mine_mbp ~/.zprofile; then
+grep -q zprofile_mine_mbp ~/.zprofile || {
   yes_or_no "? Source custom zprofile mine mbp?" && \
-    echo "source "$SCRIPT_DIR"/dotfiles/zprofile_mine_mbp" >> ~/.zprofile && \
-    source ~/.zshprofile
-fi
+    echo ". "$SCRIPT_DIR"/dotfiles/zprofile_mine_mbp" >> ~/.zprofile 
+}
+
+grep -q zprofile_mine_joeb ~/.zprofile || {
+  yes_or_no "? Source custom zprofile mine joeb?" && \
+    echo ". "$SCRIPT_DIR"/dotfiles/zprofile_mine_joeb" >> ~/.zprofile 
+}
 
 touch ~/.zshrc
-if ! grep -q zshrc_mine ~/.zshrc; then
-  echo "> adding source for my zshrc..."
-  echo "source "$SCRIPT_DIR"/dotfiles/zshrc_mine" >> ~/.zshrc && \
-  source ~/.zshrc
-fi
+grep -q zshrc_mine ~/.zshrc || { 
+  echo "> adding source for my zshrc..." && \
+  echo ". "$SCRIPT_DIR"/dotfiles/zshrc_mine" >> ~/.zshrc 
+}
 
-if ! command -v rustup &> /dev/null; then
-    echo "> Installing rust..."
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-    rustup update stable
+. "$HOME/.zshenv"
+. "$HOME/.zprofile"
+. "$HOME/.zshrc"
+
+command -v rustup >/dev/null 2>&1 || {
+    echo "> Installing rust..." && \
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh && \
+    rustup update stable && \
     rustup update nightly
-fi
+}
 
-if ! command -v cargo-binstall &> /dev/null; then
-    echo "> Installing cargo binstall..."
+command -v cargo-binstall >/dev/null 2>&1 || {
+    echo "> Installing cargo binstall..." && \
     cargo install cargo-binstall
-fi
+}
 
-if ! command -v rtx &> /dev/null; then
-    echo "> Installing rtx..."
-    cargo-binstall rtx-cli
-fi
+command -v rtx >/dev/null 2>&1 || {
+    echo "> Installing rtx..." && \
+    cargo-binstall rtx-cli -y
+}
 
-if ! command -v sccache &> /dev/null; then
-  echo "> Installing sccache..."
+command -v sccache >/dev/null 2>&1 || {
+  echo "> Installing sccache..." && \
   cargo-binstall sccache -y
-fi
+}
 
-if ! command -v genemichaels &> /dev/null; then
-  echo "> Installing genemichaels..."
+command -v genemichaels >/dev/null 2>&1 || {
+  echo "> Installing genemichaels..." && \
   cargo-binstall genemichaels -y
-fi
+}
 
 #RTX_PLUGINS="neovim python age"
 #for plugin in $RTX_PLUGINS; do
-    #if ! rtx plugins | grep $plugin; then
+    #if [ ! rtx plugins | grep $plugin ]; then
         #echo "Installing $plugin rtx plugin..."
         #rtx plugin install $plugin
     #fi
@@ -113,22 +104,19 @@ fi
 
 # postgres settings
 FILE=~/.psqlrc
-#confirm_file_del $FILE
 link_if_ne $FILE $SCRIPT_DIR/dotfiles/psqlrc
 
 # git
 mkdir -p ~/.config/git
 FILE=~/.config/git/ignore
-#confirm_file_del $FILE
 link_if_ne $FILE $SCRIPT_DIR/config/git/ignore
 
 FILE=~/.config/git/config
-#confirm_file_del $FILE
 link_if_ne $FILE $SCRIPT_DIR/config/git/gitconfig
 
 # Vim
 # Astro Vim for now
-if [[ ! -d "${HOME}/.config/nvim" ]]; then
+if ! [ -d "${HOME}/.config/nvim" ]; then
   yes_or_no "Install AstroVim config?" && \
     git clone https://github.com/AstroNvim/AstroNvim ~/.config/nvim && \
     git clone https://github.com/RingOfStorms/astronvim_config ~/.config/nvim/lua/user
