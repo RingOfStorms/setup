@@ -45,61 +45,61 @@ touch ~/.config/environment/.env
 # shell configs
 touch ~/.zshenv
 if ! grep -q zshenv_mine ~/.zshenv; then
-  echo "adding source for my zshenv..."
-  echo "source "$SCRIPT_DIR"/dotfiles/zshenv_mine" >> ~/.zshenv
+  echo "> adding source for my zshenv..."
+  echo "source "$SCRIPT_DIR"/dotfiles/zshenv_mine" >> ~/.zshenv && \
   source ~/.zshenv
 fi
 
 touch ~/.zprofile
 if ! grep -q zprofile_mine ~/.zprofile; then
-  echo "adding source for my zprofile..."
-  echo "source "$SCRIPT_DIR"/dotfiles/zprofile_mine" >> ~/.zprofile
+  echo "> adding source for my zprofile..."
+  echo "source "$SCRIPT_DIR"/dotfiles/zprofile_mine" >> ~/.zprofile && \
   source ~/.zshprofile
 fi
 
 if ! grep -q zprofile_work_tl ~/.zprofile; then
-  yes_or_no "Source custom zprofile work tl?" && \
+  yes_or_no "? Source custom zprofile work tl?" && \
     echo "source "$SCRIPT_DIR"/dotfiles/zprofile_work_tl" >> ~/.zprofile && \
     source ~/.zshprofile
 fi
 
 if ! grep -q zprofile_mine_mbp ~/.zprofile; then
-  yes_or_no "Source custom zprofile mine mbp?" && \
+  yes_or_no "? Source custom zprofile mine mbp?" && \
     echo "source "$SCRIPT_DIR"/dotfiles/zprofile_mine_mbp" >> ~/.zprofile && \
     source ~/.zshprofile
 fi
 
 touch ~/.zshrc
-if ! grep zshrc_mine ~/.zshrc; then
-  echo "adding source for my zshrc..."
-  echo "source "$SCRIPT_DIR"/dotfiles/zshrc_mine" >> ~/.zshrc
+if ! grep -q zshrc_mine ~/.zshrc; then
+  echo "> adding source for my zshrc..."
+  echo "source "$SCRIPT_DIR"/dotfiles/zshrc_mine" >> ~/.zshrc && \
   source ~/.zshrc
 fi
 
 if ! command -v rustup &> /dev/null; then
-    echo "Installing rust..."
+    echo "> Installing rust..."
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
     rustup update stable
     rustup update nightly
 fi
 
 if ! command -v cargo-binstall &> /dev/null; then
-    echo "Installing cargo binstall..."
+    echo "> Installing cargo binstall..."
     cargo install cargo-binstall
 fi
 
 if ! command -v rtx &> /dev/null; then
-    echo "Installing rtx..."
+    echo "> Installing rtx..."
     cargo-binstall rtx-cli
 fi
 
 if ! command -v sccache &> /dev/null; then
-  echo "Installing sccache..."
+  echo "> Installing sccache..."
   cargo-binstall sccache -y
 fi
 
 if ! command -v genemichaels &> /dev/null; then
-  echo "Installing genemichaels..."
+  echo "> Installing genemichaels..."
   cargo-binstall genemichaels -y
 fi
 
@@ -133,8 +133,7 @@ if [[ ! -d "${HOME}/.config/nvim" ]]; then
     git clone https://github.com/AstroNvim/AstroNvim ~/.config/nvim && \
     git clone https://github.com/RingOfStorms/astronvim_config ~/.config/nvim/lua/user
 else
-  echo nvim config already setup
+  echo "| Skipped nvim config setup, already content at ~/.config/nvim"
 fi
 
-# # # # #
-echo done
+echo "+ DONE +"
