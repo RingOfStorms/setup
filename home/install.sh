@@ -28,22 +28,53 @@ function confirm_file_del {
 function link_if_ne {
   FILE=$1
   SOURCE=$2
-  [ ! -f $FILE ] && [ ! -d $FILE ] && [ ! -L $FILE ] && ln -s $SOURCE $FILE && echo " > Linked $SOURCE to $FILE" || echo " | Skipped linking $SOURCE to $FILE"
+  [ ! -f $FILE ] && [ ! -d $FILE ] && [ ! -L $FILE ] && ln -s $SOURCE $FILE && echo " >Linked $SOURCE to $FILE" || echo "| Skipped linking $SOURCE to $FILE"
 }
 
 function copy_if_ne {
   FILE=$1
   SOURCE=$2
   cp $SOURCE $FILE
-  [ ! -f $FILE ] && [ ! -d $FILE ] && [ ! -L $FILE ] && cp $SOURCE $FILE && echo " > Copied $SOURCE to $FILE" || echo " | Skipped copying $SOURCE to $FILE"
+  [ ! -f $FILE ] && [ ! -d $FILE ] && [ ! -L $FILE ] && cp $SOURCE $FILE && echo "> Copied $SOURCE to $FILE" || echo "| Skipped copying $SOURCE to $FILE"
 }
 
-function load_nvm {
-    export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
-    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
-}
+# env
+mkdir -p ~/.config/environment
+touch ~/.config/environment/.env
 
+# shell configs
+touch ~/.zshenv
+if ! grep -q zshenv_mine ~/.zshenv; then
+  echo "adding source for my zshenv..."
+  echo "source "$SCRIPT_DIR"/dotfiles/zshenv_mine" >> ~/.zshenv
+  source ~/.zshenv
+fi
 
+touch ~/.zprofile
+if ! grep -q zprofile_mine ~/.zprofile; then
+  echo "adding source for my zprofile..."
+  echo "source "$SCRIPT_DIR"/dotfiles/zprofile_mine" >> ~/.zprofile
+  source ~/.zshprofile
+fi
+
+if ! grep -q zprofile_work_tl ~/.zprofile; then
+  yes_or_no "Source custom zprofile work tl?" && \
+    echo "source "$SCRIPT_DIR"/dotfiles/zprofile_work_tl" >> ~/.zprofile && \
+    source ~/.zshprofile
+fi
+
+if ! grep -q zprofile_mine_mbp ~/.zprofile; then
+  yes_or_no "Source custom zprofile mine mbp?" && \
+    echo "source "$SCRIPT_DIR"/dotfiles/zprofile_mine_mbp" >> ~/.zprofile && \
+    source ~/.zshprofile
+fi
+
+touch ~/.zshrc
+if ! grep zshrc_mine ~/.zshrc; then
+  echo "adding source for my zshrc..."
+  echo "source "$SCRIPT_DIR"/dotfiles/zshrc_mine" >> ~/.zshrc
+  source ~/.zshrc
+fi
 
 if ! command -v rustup &> /dev/null; then
     echo "Installing rust..."
@@ -62,6 +93,16 @@ if ! command -v rtx &> /dev/null; then
     cargo-binstall rtx-cli
 fi
 
+if ! command -v sccache &> /dev/null; then
+  echo "Installing sccache..."
+  cargo-binstall sccache -y
+fi
+
+if ! command -v genemichaels &> /dev/null; then
+  echo "Installing genemichaels..."
+  cargo-binstall genemichaels -y
+fi
+
 #RTX_PLUGINS="neovim python age"
 #for plugin in $RTX_PLUGINS; do
     #if ! rtx plugins | grep $plugin; then
@@ -70,57 +111,30 @@ fi
     #fi
 #done
 
-yes_or_no "Is work laptop?"
-IS_WORK=$?
-
-# profiles
-confirm_file_del ~/.zprofile
-touch ~/.zprofile
-if ! grep -q zprofile_mine ~/.zprofile; then
-  echo "sourcing custom zprofile..."
-  echo "source "$SCRIPT_DIR"/dotfiles/zprofile_mine" >> ~/.zprofile
-fi
-if [[ $IS_WORK == 0 ]]; then
-  if ! grep -q zprofile_work_tl ~/.zprofile; then
-    yes_or_no "Source custom zprofile work tl?" && \
-      echo "source "$SCRIPT_DIR"/dotfiles/zprofile_work_tl" >> ~/.zprofile
-  fi
-else
-  if ! grep -q zprofile_mine_mbp ~/.zprofile; then
-    yes_or_no "Source custom zprofile mine mbp?" && \
-      echo "source "$SCRIPT_DIR"/dotfiles/zprofile_mine_mbp" >> ~/.zprofile
-  fi
-fi
-
-# postgres
-echo
+# postgres settings
 FILE=~/.psqlrc
-confirm_file_del $FILE
-copy_if_ne $FILE $SCRIPT_DIR/dotfiles/psqlrc
-
-# zshenv
-#echo # i dont remember why I added this here, is it copy pasta?
-#FILE=~/.zshrc
 #confirm_file_del $FILE
-#link_if_ne $FILE ~/.zshrc
+link_if_ne $FILE $SCRIPT_DIR/dotfiles/psqlrc
 
 # git
-echo
 mkdir -p ~/.config/git
 FILE=~/.config/git/ignore
-confirm_file_del $FILE
-copy_if_ne $FILE $SCRIPT_DIR/config/git/ignore
+#confirm_file_del $FILE
+link_if_ne $FILE $SCRIPT_DIR/config/git/ignore
 
-echo
-FILE=~/.gitconfig
-confirm_file_del $FILE
-copy_if_ne $FILE $SCRIPT_DIR/config/git/gitconfig
+FILE=~/.config/git/config
+#confirm_file_del $FILE
+link_if_ne $FILE $SCRIPT_DIR/config/git/gitconfig
 
 # Vim
 # Astro Vim for now
-yes_or_no "Install AstroVim config?" && \
-  git clone https://github.com/AstroNvim/AstroNvim ~/.config/nvim && \
-  git clone https://github.com/RingOfStorms/astronvim_config ~/.config/nvim/lua/user
+if [[ ! -d "${HOME}/.config/nvim" ]]; then
+  yes_or_no "Install AstroVim config?" && \
+    git clone https://github.com/AstroNvim/AstroNvim ~/.config/nvim && \
+    git clone https://github.com/RingOfStorms/astronvim_config ~/.config/nvim/lua/user
+else
+  echo nvim config already setup
+fi
 
 # # # # #
 echo done

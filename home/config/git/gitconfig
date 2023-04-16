@@ -8,8 +8,6 @@
 	required = true
 [core]
 	pager = cat
-	excludesfile = ~/.config/git/ignore
-	config = ~/.gitconfig
 	editor = nvim
 [pull]
 	rebase = false

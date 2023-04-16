@@ -1,0 +1,292 @@
+# # Sourced after profile, only used for interactive shells
+
+
+# Helper utility for checking that a command exists
+assert_command () {
+  missing=0
+
+  if ! command -v "$1" &> /dev/null; then
+    if [ -z "$2" ]; then
+      echo "Missing required binary: $1"
+      missing=1
+    else
+      return 1
+    fi
+  fi
+
+  return missing
+}
+
+# # Settings
+export CLICOLOR=1
+export LSCOLORS=gxBxhxDxfxhxhxhxhxcxcx
+if assert_command nvim quiet; then
+  export VISUAL="nvim"
+else
+  export VISUAL="vi"
+fi
+export EDITOR="$VISUAL"
+
+
+# # Aliases and Commands
+# Unix
+alias date_compact='date +"%Y%m%d"'
+alias date_short='date +"%Y-%m-%d"'
+alias ls="ls --color -Ga"
+alias ll="ls --color -Gal"
+alias la="ls --color -GA"
+
+alias psg='ps aux | grep -v "grep" | grep'
+
+htop_psg () {
+  assert_command awk
+  htop -p $(psg $1 | awk '{r=r s $2;s=","} END{print r}')
+}
+
+htop_pid () {
+  assert_command awk
+  assert_command ps
+  htop -p $(ps -ef | awk -v proc=$1 '$3 == proc { cnt++;if (cnt == 1) { printf "%s",$2 } else { printf ",%s",$2 } }')
+}
+
+title () {
+  echo -en "\033]0;$1\a"
+}
+
+kill_port() {
+  PIDS=$(lsof -i :$1 | awk 'FRN < NR-1 {print $2}')
+  echo 'Killing: '${PIDS}
+  for pid in ${PIDS}; do
+    kill -9 ${pid} &> /dev/null
+  done
+}
+
+kill_ctl () {
+    daemons=$(sudo launchctl list | grep -v "grep" | grep ${1} | awk '{print $3}')
+    for daemon in ${daemons}; do
+      echo Quitting ${daemon}
+      sudo launchctl disable ${daemon} &> /dev/null
+      sudo launchctl kill ${daemon} &> /dev/null
+    done
+}
+
+kill_psg() {
+  PIDS=$(ps aux | grep -v "grep" | grep ${1} | awk '{print $2}')
+  echo Killing ${PIDS}
+  for pid in ${PIDS}; do
+    kill -9 ${pid} &> /dev/null
+  done
+}
+
+term_psg() {
+  assert_command awk
+  assert_command grep
+  PIDS=$(ps aux | grep -v "grep" | grep ${1} | awk '{print $2}')
+  echo Terminating ${PIDS}
+  for pid in ${PIDS}; do
+    kill -15 ${pid} &> /dev/null
+  done
+}
+
+skill_psg() {
+  PIDS=$(ps aux | grep -v "grep" | grep ${1} | awk '{print $2}')
+  echo Quitting ${PIDS}
+  for pid in ${PIDS}; do
+    sudo kill -9 ${pid} &> /dev/null
+  done;
+}
+
+mail_clear() {
+    : > /var/mail/$USER
+}
+
+# Caffeinate
+if assert_command caffeinate quiet; then
+  alias caff="caffeinate -di & disown"
+fi
+
+# SCREEN
+if assert_command screen quiet; then
+  alias s='screen'
+  alias sx='screen -x'
+  alias sr='screen -r'
+  alias sls='screen -ls'
+fi
+
+# Databases
+alias sql8_0="docker exec -it mysql8.0 mysql -uroot --password=password"
+alias sql5_6="docker exec -it mysql5.6 mysql -uroot --password=password"
+alias sql="sql8_0"
+alias psql11='docker exec -it postgres11 psql -Upostgres'
+alias psql12='docker exec -it postgres12 psql -Upostgres'
+alias psql14='docker exec -it postgres14 psql -Upostgres'
+alias psql='psql14'
+alias mongo4_4="docker exec -it mongo4_4 mongo --username admin --password password"
+alias mongo5_0="docker exec -it mongo5_0 mongo --username admin --password password"
+alias mongo5_0="docker exec -it mongo6_0 mongo --username admin --password password"
+alias mongo=mongo6_0
+alias redis6_2="docker exec -it redis6_2 redis-cli"
+alias redis=redis6_2
+
+# GIT
+if assert_command git quiet; then
+  alias stash='git stash'
+  alias pop='git stash pop'
+  alias branch='git checkout -b'
+  alias status='git status'
+  alias diff='git diff'
+  alias branches='git branch -a'
+  alias gcam='git commit -a -m'
+fi
+
+getdefault () {
+  assert_command git
+  assert_command grep
+  assert_command sed
+  git remote show origin | grep "HEAD branch" | sed 's/.*: //'
+}
+
+master () {
+  assert_command git
+  git stash
+  git checkout $(getdefault)
+  pull
+}
+
+pullmaster () {
+  assert_command git
+  git pull origin $(getdefault)
+}
+
+push () {
+  assert_command git
+  assert_command sed
+  B=$(git branch | sed -n -e 's/^\* \(.*\)/\1/p')
+  git pull origin $B
+  git push origin $B --no-verify
+}
+
+pull () {
+  assert_command git
+  assert_command sed
+  git fetch
+  B=$(git branch | sed -n -e 's/^\* \(.*\)/\1/p')
+  git pull origin $B
+}
+
+forcepush () {
+  assert_command git
+  assert_command sed
+  B=$(git branch | sed -n -e 's/^\* \(.*\)/\1/p')
+  git push origin $B --force
+}
+
+remote_branches () {
+  assert_command git
+  assert_command grep
+  git branch -a | grep 'remotes' | grep -v -E '.*(HEAD|${DEFAULT})' | cut -d'/' -f 3-
+}
+
+local_branches () {
+  assert_command git
+  assert_command grep
+  assert_command cut
+  git branch -a | grep -v 'remotes' | grep -v -E '.*(HEAD|${DEFAULT})' | grep -v '^*' |  cut -d' ' -f 3-
+}
+
+prunel () {
+  assert_command git
+  git fetch
+  git remote prune origin
+
+  for local in $(local_branches); do
+    in=false
+    for remote in $(remote_branches); do
+      if [[ ${local} = ${remote} ]]; then
+        in=true
+      fi
+    done;
+    if [[ $in = 'false' ]]; then
+      git branch -D ${local}
+    else
+      echo 'Skipping branch '${local}
+    fi
+  done;
+}
+
+checkout () {
+  assert_command git
+  git fetch
+  git checkout $1
+  pull
+}
+
+# CARGO
+if assert_command cargo quiet; then
+  if assert_command sccache quiet; then
+    alias c='RUSTC_WRAPPER=sccache cargo'
+  fi
+  alias cf='genemichaels -qp && c +nightly fmt'
+  alias cr='c run'
+  alias cwr='c watch -x run'
+  alias cc='c check'
+  alias cwc='c watch -x check'
+fi
+
+if assert_command evcxr quiet; then
+  alias rust='evcxr'
+fi
+
+# [[n]v]im
+alias n=nvim
+
+# docker
+if assert_command docker quiet; then
+  alias d='docker'
+  alias dr='docker image rm'
+  alias drm='docker image prune --filter "dangling=true" -f'
+  alias drun='docker run --rm -it -v "${HOME}/.aws:/root/.aws" -v "${HOME}/.ssh:/root/.ssh" -v "${PWD}:/workdir" -w /workdir'
+fi
+
+# ripgrep
+if assert_command rg quiet; then
+  alias rg="rg --no-ignore"
+  alias rgt="rg --no-ignore -g'!*.test.*' -g'!__mocks__/'"
+  alias rgf="rg --files | rg"
+fi
+
+# asdf / rtx
+if assert_command rtx quiet; then
+  alias asdf=rtx
+fi
+
+# firefox
+if assert_command firefox quiet; then
+  alias firefox="firefox -P </dev/null &>/dev/null & disown"
+fi
+
+decode_jwt () {
+  assert_command jq
+  jq -R 'gsub("-";"+") | gsub("_";"/") | split(".") | .[1] | @base64d | fromjson' <<< $@
+}
+
+explain () {
+  assert_command jq
+  assert_command open
+  CMD=$(jq -rn --arg x "$(echo $@)" '$x|@uri')
+  open https://explainshell.com/explain?cmd=$CMD
+}
+
+usepy () {
+  if test -f ".venv/bin/activate"; then
+    echo Found venv, activating...
+    source bin/activate
+  else
+    echo No venv found! Using system wide python
+  fi
+  python --version
+}
+
+rm_node_modules () {
+  find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +
+}

@@ -1,0 +1,11 @@
+# zshenv is sourced first, and is done every time including non-interactive shells
+# Add anything needed outside interactive shells here
+
+# BINARIES
+export PATH="${HOME}/.local/bin:${PATH}"
+export PATH="${HOME}/.cargo/bin:${PATH}"
+
+# ENV VARS
+source ~/.config/environment/.env
+
+eval "$(rtx activate zsh)"
