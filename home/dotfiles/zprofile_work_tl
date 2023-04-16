@@ -1,3 +1,5 @@
+#!/usr/bin/env bash 
+
 export TEMPUS_USER_ID='ebf230f6-8443-4bbd-ac2d-538ca35dd5cd'
 export TEMPUS_TENANT_ID='0066be0c-1687-4fd9-8a95-d8a85cd16a6f'
 

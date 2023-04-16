@@ -1,3 +1,5 @@
+#!/usr/bin/env bash 
+
 # Profile is run on login and not on every interactive shell. Use zshrc for things not needing login
 # (float terms in nvim will not source this file.)
 

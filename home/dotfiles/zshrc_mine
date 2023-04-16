@@ -1,3 +1,5 @@
+#!/usr/bin/env bash 
+
 # # Sourced after profile, only used for interactive shells
 
 

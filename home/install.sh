@@ -1,4 +1,4 @@
-# !/bin/sh
+#!/usr/bin/env bash 
 
 SCRIPT_DIR="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 
@@ -63,9 +63,9 @@ grep -q zshrc_mine ~/.zshrc || {
   echo ". "$SCRIPT_DIR"/dotfiles/zshrc_mine" >> ~/.zshrc 
 }
 
-. "$HOME/.zshenv"
-. "$HOME/.zprofile"
-. "$HOME/.zshrc"
+# . "$HOME/.zshenv"
+# . "$HOME/.zprofile"
+# . "$HOME/.zshrc"
 
 command -v rustup >/dev/null 2>&1 || {
     echo "> Installing rust..." && \
