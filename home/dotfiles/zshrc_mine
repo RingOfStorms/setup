@@ -254,7 +254,7 @@ fi
 if assert_command rg quiet; then
   alias rg="rg --no-ignore"
   alias rgt="rg --no-ignore -g'!*.test.*' -g'!__mocks__/'"
-  alias rgf="rg --files | rg"
+  alias rgf="rg --files 2> /dev/null | rg"
 fi
 
 # asdf / rtx
