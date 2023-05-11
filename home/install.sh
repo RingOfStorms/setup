@@ -63,6 +63,7 @@ grep -q zshrc_mine ~/.zshrc || {
   echo ". "$SCRIPT_DIR"/dotfiles/zshrc_mine" >> ~/.zshrc 
 }
 
+
 # . "$HOME/.zshenv"
 # . "$HOME/.zprofile"
 # . "$HOME/.zshrc"
@@ -101,6 +102,10 @@ command -v genemichaels >/dev/null 2>&1 || {
         #rtx plugin install $plugin
     #fi
 #done
+
+# wezterm
+FILE=~/.wezterm.lua
+link_if_ne $FILE $SCRIPT_DIR/dotfiles/wezterm.lua
 
 # postgres settings
 FILE=~/.psqlrc
