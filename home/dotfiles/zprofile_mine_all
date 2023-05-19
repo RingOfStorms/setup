@@ -4,7 +4,7 @@
 # (float terms in nvim will not source this file.)
 
 # Git config options
-git config --global core.excludesfile ~/.config/git/ignore
+# git config --global core.excludesfile ~/.config/git/ignore
 git config --global core.config ~/.config/git/config
 
 
