@@ -34,7 +34,7 @@ config.font = wezterm.font({
 
 wezterm.on("format-tab-title", function(tab)
 	local p = tab.active_pane
-	local idx = tab.is_active and '#' or tab.tab_index + 1 
+	local idx = tab.is_active and '' or tab.tab_index + 1 
 	local dir = basename(p.current_working_dir)
 	
 	local title = idx .. ' ' .. dir
