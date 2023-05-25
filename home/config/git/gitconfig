@@ -9,5 +9,6 @@
 [core]
 	pager = cat
 	editor = nvim
+	excludesFile = ~/.config/git/ignore
 [pull]
 	rebase = false

@@ -15,13 +15,12 @@ yes_or_no() {
 link_if_ne() {
   FILE=$1
   SOURCE=$2
-  [ ! -f $FILE ] && [ ! -d $FILE ] && [ ! -L $FILE ] && ln -s $SOURCE $FILE && echo " >Linked $SOURCE to $FILE" || echo "| Skipped linking $SOURCE to $FILE"
+  [ ! -f $FILE ] && [ ! -d $FILE ] && [ ! -L $FILE ] && ln -s $SOURCE $FILE && echo "> Linked $SOURCE to $FILE" || echo "| Skipped linking $SOURCE to $FILE"
 }
 
 copy_if_ne() {
   FILE=$1
   SOURCE=$2
-  cp $SOURCE $FILE
   [ ! -f $FILE ] && [ ! -d $FILE ] && [ ! -L $FILE ] && cp $SOURCE $FILE && echo "> Copied $SOURCE to $FILE" || echo "| Skipped copying $SOURCE to $FILE"
 }
 
@@ -113,8 +112,8 @@ link_if_ne $FILE $SCRIPT_DIR/dotfiles/psqlrc
 
 # git
 mkdir -p ~/.config/git
-FILE=~/.config/git/ignore
-link_if_ne $FILE $SCRIPT_DIR/config/git/ignore
+cp $SCRIPT_DIR/config/git/ignore ~/.config/git/ignore
+echo "> Copied git ignore file to ~/.config/git/ignore"
 
 FILE=~/.config/git/config
 link_if_ne $FILE $SCRIPT_DIR/config/git/gitconfig
