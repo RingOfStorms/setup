@@ -39,7 +39,7 @@ tam () {
 ssample () {
   RET=$(pwd)
   echo Sampling $(pbpaste)...
-  cd ~/tempus/dps-sdk_ts; npx ts-node examples/service/sampleBetas.ts $(pbpaste); cd $RET
+  cd ~/tempus/dps-sdk_ts; npx ts-node --max-old-space-size=4096 examples/service/sampleBetas.ts $(pbpaste); cd $RET
 }
 
 killt () {
