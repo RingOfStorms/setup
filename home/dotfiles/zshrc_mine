@@ -227,6 +227,8 @@ checkout () {
 if assert_command cargo quiet; then
   if assert_command sccache quiet; then
     alias c='RUSTC_WRAPPER=sccache cargo'
+  else
+    alias c='cargo'
   fi
   alias cf='genemichaels -qp && c +nightly fmt'
   alias cr='c run'
