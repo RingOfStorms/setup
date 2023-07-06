@@ -23,7 +23,7 @@ if wezterm.config_builder then
 end
 
 if getOS() ~= "MacOS" then
-  config.disable_default_key_bindings = true
+  -- config.disable_default_key_bindings = true
   config.keys = {
     {
       key = "w",
