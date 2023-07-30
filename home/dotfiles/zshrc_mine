@@ -38,7 +38,7 @@ alias ls="ls --color -Ga"
 alias ll="ls --color -Gal"
 alias la="ls --color -GA"
 
-alias psg='ps aux | grep -v "grep" | grep'
+alias psg='ps aux | head -n 1 && ps aux | grep -v "grep" | grep'
 
 htop_psg () {
   assert_command awk
