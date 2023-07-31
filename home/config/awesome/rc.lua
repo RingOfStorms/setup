@@ -582,5 +582,5 @@ client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_n
 -- }}}
 
 awful.spawn.with_shell(
-"xrandr --output DP-0 --mode 3840x2160 --rate 97.98 --output DP-3 --mode 3440x1440 --rate 49.99 --rotate left --left-of DP-0")
+"LIST_MON=$(xrandr --listmonitors); MAIN=$(echo $LIST_MON | grep ' 3840' | tr ' ' '\n' | tail -1); SECO=$(echo $LIST_MON | grep ' 3440' | tr ' ' '\n' | tail -1); xrandr --output $MAIN --mode 3840x2160 --rate 97.98 --output $SECO --mode 3440x1440 --rate 49.99 --rotate left --left-of $MAIN")
 awful.spawn.with_shell("ulauncher")
