@@ -1,0 +1,9 @@
+#!/bin/sh
+
+xsetroot -solid black
+xset b 20 # set bell to 20%
+xset s off # screensaver off
+
+dbus-update-activation-environment DISPLAY XAUTHORITY
+
+exec /usr/bin/awesome
