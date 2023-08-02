@@ -102,6 +102,10 @@ command -v genemichaels >/dev/null 2>&1 || {
     #fi
 #done
 
+# awesome
+FILE=~/.config/awsome/rc.lua
+link_if_ne $FILE $SCRIPT_DIR/config/awesome/rc.lua
+
 # wezterm
 FILE=~/.wezterm.lua
 link_if_ne $FILE $SCRIPT_DIR/dotfiles/wezterm.lua
@@ -112,6 +116,7 @@ link_if_ne $FILE $SCRIPT_DIR/dotfiles/psqlrc
 
 # git
 mkdir -p ~/.config/git
+# note that git ignore cannot be symlinked, just copy content
 cp $SCRIPT_DIR/config/git/ignore ~/.config/git/ignore
 echo "> Copied git ignore file to ~/.config/git/ignore"
 
