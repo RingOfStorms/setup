@@ -223,6 +223,10 @@ checkout () {
   pull
 }
 
+from_master () {
+  git checkout $(getdefault) $@
+}
+
 # CARGO
 if assert_command cargo quiet; then
   if assert_command sccache quiet; then
