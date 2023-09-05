@@ -139,6 +139,7 @@ if assert_command git quiet; then
   alias diff='git diff'
   alias branches='git branch -a'
   alias gcam='git commit -a -m'
+  alias stashes='git stash list'
 fi
 
 getdefault () {
@@ -224,6 +225,7 @@ checkout () {
 }
 
 from_master () {
+  assert_command git
   git checkout $(getdefault) $@
 }
 
