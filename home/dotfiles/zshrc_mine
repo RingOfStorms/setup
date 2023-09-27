@@ -106,9 +106,11 @@ mail_clear() {
 notes () {
   assert_command convert # brew install imagemagick
   assert_command parallel # brew install parallel && parallel --citation
-  find ~/Downloads -name '*.jpg' -exec sh -c 'f="{}"; p="${f%.jpg}.png"; m="${f%.jpg}_mask.png"; \
+  find ~/Downloads -name '*.jpg' -exec sh -c 'f="{}"; p="${f%.jpg}.png"; m="${f%.jpg}_color.png"; \
     convert -quiet "$f" -colorspace Gray -threshold 80% "$p" && \
-    convert "$p" -contrast-stretch 0% -fuzz 70% -transparent white -trim -quiet "$p"' \;
+    convert -quiet "$p" -contrast-stretch 0% -fuzz 70% -transparent white -trim "$p" && \
+    convert -quiet "$f" -contrast-stretch 0% -fuzz 50% -transparent white -trim "$m" && \
+    rm "$f"' \;
 }
 
 # Caffeinate
