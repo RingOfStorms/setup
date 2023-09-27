@@ -102,6 +102,11 @@ mail_clear() {
     : > /var/mail/$USER
 }
 
+# Samung note processing
+notes () {
+  find ~/Downloads -name 'Notes_*.jpg' -exec sh -c 'f="{}"; convert "$f" "${f%.jpg}.png" && rm "$f" && convert "${f%.jpg}.png" -fuzz 80% -transparent white "${f%.jpg}.png" && mv "${f%.jpg}.png "' \;
+}
+
 # Caffeinate
 if assert_command caffeinate quiet; then
   alias caff="caffeinate -di & disown"
