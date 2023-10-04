@@ -1,0 +1,6 @@
+#!/usr/bin/env bash 
+
+tempus_cmd () {
+  CMD=$@
+  ssh -t tempus "zsh -lc '$CMD'" 2> /dev/null
+}

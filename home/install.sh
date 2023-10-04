@@ -30,9 +30,15 @@ touch ~/.config/environment/.env
 
 # shell configs
 touch ~/.zshenv
-grep -q zshenv_mine ~/.zshenv || {
+grep -q zshenv_mine_all ~/.zshenv || {
   echo "> adding source for my zshenv..." && \
-  echo ". "$SCRIPT_DIR"/dotfiles/zshenv_mine" >> ~/.zshenv 
+  echo ". "$SCRIPT_DIR"/dotfiles/zshenv_mine_all" >> ~/.zshenv 
+}
+
+touch ~/.zshenv
+grep -q zshenv_mine_joeb ~/.zshenv || {
+  yes_or_no "? Source custom zshenv mine joeb?" && \
+  echo ". "$SCRIPT_DIR"/dotfiles/zshenv_mine_joeb" >> ~/.zshenv 
 }
 
 touch ~/.zprofile
@@ -57,11 +63,15 @@ grep -q zprofile_mine_joeb ~/.zprofile || {
 }
 
 touch ~/.zshrc
-grep -q zshrc_mine ~/.zshrc || { 
+grep -q zshrc_mine_all ~/.zshrc || { 
   echo "> adding source for my zshrc..." && \
-  echo ". "$SCRIPT_DIR"/dotfiles/zshrc_mine" >> ~/.zshrc 
+  echo ". "$SCRIPT_DIR"/dotfiles/zshrc_mine_all" >> ~/.zshrc 
 }
 
+grep -q zshrc_mine_joeb ~/.zshrc || {
+  yes_or_no "? Source custom zshrc mine joeb?" && \
+    echo ". "$SCRIPT_DIR"/dotfiles/zshrc_mine_joeb" >> ~/.zshrc 
+}
 
 # . "$HOME/.zshenv"
 # . "$HOME/.zprofile"

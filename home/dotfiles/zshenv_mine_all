@@ -1,5 +1,3 @@
-#!/usr/bin/env bash 
-
 # zshenv is sourced first, and is done every time including non-interactive shells
 # Add anything needed outside interactive shells here
 

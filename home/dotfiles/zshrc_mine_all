@@ -281,16 +281,6 @@ explain () {
   open https://explainshell.com/explain?cmd=$CMD
 }
 
-usepy () {
-  if test -f ".venv/bin/activate"; then
-    echo Found venv, activating...
-    source bin/activate
-  else
-    echo No venv found! Using system wide python
-  fi
-  python --version
-}
-
 rm_node_modules () {
   find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +
 }
