@@ -104,7 +104,7 @@ config.colors = {
 }
 
 config.font = wezterm.font_with_fallback({ {
-  family = "JetBrains Mono",
+  family = "JetBrainsMono Nerd Font Mono",
   weight = "Regular",
 }, "Terminus" })
 
