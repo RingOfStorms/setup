@@ -262,9 +262,9 @@ fi
 alias n=nvim
 
 # bat, cat(1) with wings
-if assert_command bat; then
+# if assert_command bat; then
   alias cat='bat --pager=never'
-fi
+# fi
 
 # docker
 if assert_command docker quiet; then

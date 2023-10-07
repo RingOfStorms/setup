@@ -4,3 +4,8 @@ reboot_to_windows () {
     windows_title=$(sudo grep -i windows /boot/grub/grub.cfg | cut -d "'" -f 2)
     sudo grub-reboot "$windows_title" && sudo reboot
 }
+
+fixkeys () {
+  xmodmap -e "pointer = 1 2 3 5 4 7 6 8 9 10 11 12" 2> /dev/null
+  setxkbmap -option caps:escape
+}
