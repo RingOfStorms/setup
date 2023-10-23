@@ -263,7 +263,8 @@ alias n=nvim
 
 # bat, cat(1) with wings
 # if assert_command bat; then
-  alias cat='bat --pager=never -p --theme Dracula'
+  alias bat='bat --theme Coldark-Dark'
+  alias cat='bat --pager=never -p'
 # fi
 
 # docker
