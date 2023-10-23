@@ -113,7 +113,7 @@ command -v genemichaels >/dev/null 2>&1 || {
 #done
 
 # awesome
-FILE=~/.config/awsome/rc.lua
+FILE=~/.config/awesome/rc.lua
 link_if_ne $FILE $SCRIPT_DIR/config/awesome/rc.lua
 
 # wezterm
