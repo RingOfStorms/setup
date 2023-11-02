@@ -112,9 +112,22 @@ command -v genemichaels >/dev/null 2>&1 || {
     #fi
 #done
 
-# awesome
-FILE=~/.config/awesome/rc.lua
-link_if_ne $FILE $SCRIPT_DIR/config/awesome/rc.lua
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  echo "MacOS specifics..."
+  
+  mkdir -p ~/.hammerspoon
+  FILE=~/.hammerspoon/init.lua
+  link_if_ne $FILE $SCRIPT_DIR/dotfiles/hammerspoon.lua
+
+elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+  echo "Linux specifics..."
+
+  # awesome
+  FILE=~/.config/awesome/rc.lua
+  link_if_ne $FILE $SCRIPT_DIR/config/awesome/rc.lua
+else
+  echo "Unknown OS!"
+fi
 
 # wezterm
 FILE=~/.wezterm.lua
