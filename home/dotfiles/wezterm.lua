@@ -1,17 +1,8 @@
--- https://stackoverflow.com/a/30960054
-function getOS()
-  local binary_format = package.cpath:match("%p[\\|/]?%p(%a+)")
-  if binary_format == "dll" then
-    return "Windows"
-  elseif binary_format == "so" then
-    return "Linux"
-  elseif binary_format == "dylib" then
-    return "MacOS"
-  end
-end
+local info = os.getenv("WEZTERM_EXECUTABLE")
+local isMac = info:find("MacOS") ~= nil
 
 -- gets basename of path. From https://stackoverflow.com/a/39872872
-function basename(str)
+local function basename(str)
   return str:sub(str:find("/[^/|\\]*$") + 1)
 end
 
@@ -22,7 +13,7 @@ if wezterm.config_builder then
   config = wezterm.config_builder()
 end
 
-if getOS() ~= "MacOS" then
+if isMac then
   -- config.disable_default_key_bindings = true
   config.keys = {
     {
@@ -90,6 +81,11 @@ end
 
 config.color_scheme = "Material Darker (base16)"
 
+if isMac then
+  config.font_size = 16
+  config.window_decorations = "INTEGRATED_BUTTONS|RESIZE"
+end
+
 config.window_frame = {
   font = wezterm.font({ family = "JetBrains Mono", weight = "Bold" }),
 }
@@ -103,23 +99,25 @@ config.colors = {
   },
 }
 
-config.font = wezterm.font_with_fallback({ {
-  family = "JetBrainsMono Nerd Font Mono",
-  weight = "Regular",
-}, "Terminus" })
+config.font = wezterm.font_with_fallback({
+  {
+    family = "JetBrainsMono Nerd Font Mono",
+    weight = "Regular",
+  },
+  { family = "Terminus" },
+})
 
--- config.window_decorations = "INTEGRATED_BUTTONS|RESIZE"
 
 wezterm.on("format-tab-title", function(tab)
   local p = tab.active_pane
-  local idx = tab.is_active and '' or tab.tab_index + 1
+  local idx = tab.is_active and "" or tab.tab_index + 1
   local dir = basename(p.current_working_dir)
 
-  local title = idx .. ' ' .. dir
+  local title = idx .. " " .. dir
 
   local proc = basename(p.foreground_process_name)
-  if proc ~= 'zsh' then
-    title = title .. ' ' .. proc
+  if proc ~= "zsh" then
+    title = title .. " " .. proc
   end
 
   return title

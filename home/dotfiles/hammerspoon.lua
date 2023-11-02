@@ -7,6 +7,8 @@
 
 -- Note we set things into global vars like "GFirefox" so that lua does not GC our event listeners
 
+local LOG_KEYS = false
+
 local SUPER = "alt"
 
 -- >>> Helper functions
@@ -114,22 +116,50 @@ mapShortcut({ "z", { "control" } }, { "z", { "command" } })
 -- spotlight
 mapShortcut({ "Space", { SUPER } }, { "Space", { "command" } })
 
--- Debugging updates
-if true then
-  GWindowName = {
-    hs.eventtap
-        .new({ hs.eventtap.event.types.leftMouseUp }, function(event)
-          try(function()
-            local app = hs.window.focusedWindow():application()
-            if app and event:getFlags().cmd then
+local function getFirstWindowAtPosition(position)
+  local windows = hs.window.orderedWindows()
+  local clickedWindow = nil
+  for i, window in ipairs(windows) do
+    if hs.geometry.isPointInRect(position, window:frame()) then
+      clickedWindow = window
+      break
+    end
+  end
+  return clickedWindow
+end
+
+-- window super positioner
+GSuperPositioner = {
+  selectedWindow = nil,
+}
+GSuperPositionerEvents = {
+  hs.eventtap
+      .new({ hs.eventtap.event.types.leftMouseDown }, function(event)
+        local cancel = false
+        try(function()
+          local isSuper = event:getFlags()[SUPER]
+          cancel = isSuper
+          local windowAtClick = getFirstWindowAtPosition(event:location())
+          if windowAtClick then
+            GSuperPositioner.selectedWindow = windowAtClick
+            local app = windowAtClick:application()
+            if app and isSuper then
               hs.alert(app:name())
             end
-            -- end)
-          end)
+          end
         end)
-        :start(),
-  }
-end
+        return cancel
+      end)
+      :start(),
+
+  hs.eventtap
+      .new({ hs.eventtap.event.types.leftMouseUp }, function(event)
+        try(function()
+          GSuperPositioner.selectedWindow = nil
+        end)
+      end)
+      :start(),
+}
 
 local function flagsToString(flags)
   local str = ""
@@ -152,19 +182,21 @@ local function flagsToString(flags)
 end
 
 -- Create an event tap that listens for all events (needs to stay global or it will stop on its own)
-GKeyLogger = hs.eventtap
-    .new({ hs.eventtap.event.types.keyDown }, function(event)
-      info(
-        "keyDown event: "
-        .. string.format(
-          " Key code: %s, Characters: %s, Modifiers: %s",
-          event:getKeyCode(),
-          event:getCharacters(),
-          flagsToString(event:getFlags())
+if LOG_KEYS then
+  GKeyLogger = hs.eventtap
+      .new({ hs.eventtap.event.types.keyDown }, function(event)
+        info(
+          "keyDown event: "
+          .. string.format(
+            " Key code: %s, Characters: %s, Modifiers: %s",
+            event:getKeyCode(),
+            event:getCharacters(),
+            flagsToString(event:getFlags())
+          )
         )
-      )
-    end)
-    :start()
+      end)
+      :start()
+end
 
 -- test = hs.eventtap.new({ hs.eventtap.event.types.leftMouseDown }, function ()
 --   local win = window.focusedWindow()
@@ -173,7 +205,7 @@ GKeyLogger = hs.eventtap
 --   end
 -- end):start()
 
-hs.alert("hammerspoon loaded")
+-- hs.alert("hammerspoon loaded")
 
 -- hs.screen.mainScreen()
 --
