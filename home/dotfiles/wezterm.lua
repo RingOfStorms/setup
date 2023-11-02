@@ -13,7 +13,6 @@ if wezterm.config_builder then
   config = wezterm.config_builder()
 end
 
-if isMac then
   -- config.disable_default_key_bindings = true
   config.keys = {
     {
@@ -77,7 +76,6 @@ if isMac then
       action = wezterm.action.ActivateTab(9),
     },
   }
-end
 
 config.color_scheme = "Material Darker (base16)"
 

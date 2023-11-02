@@ -195,6 +195,12 @@ end)
 globalkeys = gears.table.join(
   awful.key({ modkey, }, "s", hotkeys_popup.show_help,
     { description = "show help", group = "awesome" }),
+  awful.key({ modkey, }, "q", function()
+      if client.focus then
+        client.focus:kill()
+      end
+    end,
+    { description = "quit application", group = "client" }),
   awful.key({ modkey, }, "h", awful.tag.viewprev,
     { description = "view previous", group = "tag" }),
   awful.key({ modkey, }, "l", awful.tag.viewnext,
@@ -406,30 +412,30 @@ client.connect_signal("request::titlebars", function(c)
     end)
   )
 
-  awful.titlebar(c):setup {
-    { -- Left
-      awful.titlebar.widget.iconwidget(c),
-      buttons = buttons,
-      layout  = wibox.layout.fixed.horizontal
-    },
-    {   -- Middle
-      { -- Title
-        align  = "center",
-        widget = awful.titlebar.widget.titlewidget(c)
-      },
-      buttons = buttons,
-      layout  = wibox.layout.flex.horizontal
-    },
-    { -- Right
-      awful.titlebar.widget.floatingbutton(c),
-      -- awful.titlebar.widget.maximizedbutton(c),
-      awful.titlebar.widget.ontopbutton(c),
-      awful.titlebar.widget.stickybutton(c),
-      awful.titlebar.widget.closebutton(c),
-      layout = wibox.layout.fixed.horizontal()
-    },
-    layout = wibox.layout.align.horizontal
-  }
+  -- awful.titlebar(c):setup {
+  --   { -- Left
+  --     awful.titlebar.widget.iconwidget(c),
+  --     buttons = buttons,
+  --     layout  = wibox.layout.fixed.horizontal
+  --   },
+  --   {   -- Middle
+  --     { -- Title
+  --       align  = "center",
+  --       widget = awful.titlebar.widget.titlewidget(c)
+  --     },
+  --     buttons = buttons,
+  --     layout  = wibox.layout.flex.horizontal
+  --   },
+  --   { -- Right
+  --     awful.titlebar.widget.floatingbutton(c),
+  --     -- awful.titlebar.widget.maximizedbutton(c),
+  --     awful.titlebar.widget.ontopbutton(c),
+  --     awful.titlebar.widget.stickybutton(c),
+  --     awful.titlebar.widget.closebutton(c),
+  --     layout = wibox.layout.fixed.horizontal()
+  --   },
+  --   layout = wibox.layout.align.horizontal
+  -- }
 end)
 -- }}}
 
