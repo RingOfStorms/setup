@@ -9,7 +9,38 @@ local LOG_KEYS = false
 
 local SUPER = "alt"
 
+local HOME = os.getenv("HOME")
+local disable_file = HOME .. "/.hammerspoon/_disabled"
+local f = io.open(disable_file, "r")
+local DISABLED = not not f
+if f then
+  f:close()
+end
+
+hs.hotkey.bind({ "ctrl", SUPER }, "r", function()
+  hs.reload()
+end, nil, nil)
+hs.hotkey.bind({ "shift", SUPER }, "Q", function()
+  if DISABLED then
+    os.remove(disable_file)
+  else
+    local file = io.open(disable_file, "w")
+    file:close()
+  end
+  hs.reload()
+end)
+
+if DISABLED then
+  hs.alert("Hammerspoon Disabled")
+  return
+end
+
 -- >>> Helper functions
+GLOBAL_CACHE = {}
+local function persist(...)
+  table.insert(GLOBAL_CACHE, table.pack(...))
+end
+
 local info = hs.logger.new("INFO", "info").i
 local inspect = hs.inspect.inspect
 local try = function(func)
@@ -17,6 +48,15 @@ local try = function(func)
   if not status then
     info("Failed to run function: " .. tostring(error))
   end
+end
+
+local function contains(table, item)
+  for _, value in ipairs(table) do
+    if value == item then
+      return true
+    end
+  end
+  return false
 end
 
 -- local disabled_keys = {}
@@ -77,22 +117,20 @@ require("AwesomeWM")({
 })
 
 -- Firefox updates
-GFirefox = {
-  hs.eventtap
-    .new({ hs.eventtap.event.types.leftMouseDown }, function(event)
-      -- Change ctrl left click to cmd left click
-      if hs.window and hs.window.focusedWindow() then
-        local app = hs.window.focusedWindow():application()
-        if app and app:name() == "Firefox" then
-          if event:getFlags()["ctrl"] then
-            click(event:location(), { "cmd" })
-            return true
-          end
+persist(hs.eventtap
+  .new({ hs.eventtap.event.types.leftMouseDown }, function(event)
+    -- Change ctrl left click to cmd left click
+    if hs.window and hs.window.focusedWindow() then
+      local app = hs.window.focusedWindow():application()
+      if app and app:name() == "Firefox" then
+        if event:getFlags()["ctrl"] then
+          click(event:location(), { "cmd" })
+          return true
         end
       end
-    end)
-    :start(),
-}
+    end
+  end)
+  :start())
 
 -- Disabled keys
 -- GDisableKeys = {
@@ -121,7 +159,7 @@ GFirefox = {
 --     :start(),
 -- }
 
-local function mapShortcut(to, from)
+local function mapShortcut(to, from, opts)
   local function callFrom()
     if from[2] then
       -- Need to clear the currently held modifier first or it doesn't work 100% of the time
@@ -129,16 +167,39 @@ local function mapShortcut(to, from)
     end
     hs.eventtap.keyStroke(from[2], from[1], 0)
   end
-  hs.hotkey.bind(to[2], to[1], callFrom, nil, callFrom)
+  local hotkey = hs.hotkey.bind(to[2], to[1], callFrom, nil, callFrom)
+  local events = {}
+  if opts and opts.disabled_apps then
+    events.disabled_apps = hs.application.watcher
+      .new(function(appName, eventType, appObject)
+        -- hs.alert("Focus " .. appName .. inspect(to) .. " " .. tostring(contains(opts.disabled_apps, appName)) .. ' ' .. inspect(opts))
+        -- If the specific application gains focus, disable the hotkey, else enable
+        if contains(opts.disabled_apps, appName) and eventType == hs.application.watcher.activated then
+          -- delay so if we are in another disabled app it will stay disabled after being enabled
+          hs.timer.doAfter(0.1, function()
+            hotkey:disable()
+            -- hs.alert("disabled hotkey")
+          end)
+        elseif contains(opts.disabled_apps, appName) and eventType == hs.application.watcher.deactivated then
+          hotkey:enable()
+          -- hs.alert("enabled hotkey")
+        end
+      end)
+      :start()
+  end
+  persist(events)
+  return events, hotkey
 end
 
 -- cmd + {} -> ctrl {} remaps
 mapShortcut({ "f", { "control" } }, { "f", { "command" } })
 mapShortcut({ "a", { "control" } }, { "a", { "command" } })
-mapShortcut({ "c", { "control" } }, { "c", { "command" } })
+mapShortcut({ "c", { "control" } }, { "c", { "command" } }, { disabled_apps = { "WezTerm" } })
 mapShortcut({ "v", { "control" } }, { "v", { "command" } })
 mapShortcut({ "x", { "control" } }, { "x", { "command" } })
 mapShortcut({ "z", { "control" } }, { "z", { "command" } })
+mapShortcut({ "t", { "control" } }, { "t", { "command" } })
+mapShortcut({ "w", { "control" } }, { "w", { "command" } })
 
 -- spotlight
 mapShortcut({ "Space", { SUPER } }, { "Space", { "command" } })
@@ -166,7 +227,7 @@ end
 
 -- Create an event tap that listens for all events (needs to stay global or it will stop on its own)
 if LOG_KEYS then
-  GKeyLogger = hs.eventtap
+  persist(hs.eventtap
     .new({ hs.eventtap.event.types.keyDown }, function(event)
       info(
         "keyDown event: "
@@ -178,7 +239,7 @@ if LOG_KEYS then
           )
       )
     end)
-    :start()
+    :start())
 end
 
 -- test = hs.eventtap.new({ hs.eventtap.event.types.leftMouseDown }, function ()
@@ -188,7 +249,4 @@ end
 --   end
 -- end):start()
 
-hs.hotkey.bind({ "ctrl", SUPER }, "r", function()
-  hs.reload()
-end, nil, nil)
 hs.alert("Hammerspoon Loaded")
