@@ -174,30 +174,30 @@ local function mapShortcut(to, from, opts)
   if opts and opts.whitelist then
     hotkey:disable()
     events.whitelist = hs.application.watcher
-      .new(function(appName, eventType, appObject)
-        local isWhitelisted = contains(opts.whitelist, appName)
-        if isWhitelisted and eventType == hs.application.watcher.activated then
-          hs.timer.doAfter(0.1, function()
-            hotkey:enable()
-          end)
-        elseif isWhitelisted and eventType == hs.application.watcher.deactivated then
-          hotkey:disable()
-        end
-      end)
-      :start()
+        .new(function(appName, eventType, appObject)
+          local isWhitelisted = contains(opts.whitelist, appName)
+          if isWhitelisted and eventType == hs.application.watcher.activated then
+            hs.timer.doAfter(0.1, function()
+              hotkey:enable()
+            end)
+          elseif isWhitelisted and eventType == hs.application.watcher.deactivated then
+            hotkey:disable()
+          end
+        end)
+        :start()
   elseif opts and opts.blacklist then
     events.blacklist = hs.application.watcher
-      .new(function(appName, eventType, appObject)
-        local isBlacklisted = contains(opts.blacklist, appName)
-        if isBlacklisted and eventType == hs.application.watcher.activated then
-          hs.timer.doAfter(0.1, function()
-            hotkey:disable()
-          end)
-        elseif isBlacklisted and eventType == hs.application.watcher.deactivated then
-          hotkey:enable()
-        end
-      end)
-      :start()
+        .new(function(appName, eventType, appObject)
+          local isBlacklisted = contains(opts.blacklist, appName)
+          if isBlacklisted and eventType == hs.application.watcher.activated then
+            hs.timer.doAfter(0.1, function()
+              hotkey:disable()
+            end)
+          elseif isBlacklisted and eventType == hs.application.watcher.deactivated then
+            hotkey:enable()
+          end
+        end)
+        :start()
   end
   persist(events)
   return events, hotkey
@@ -214,6 +214,12 @@ mapShortcut({ "t", { "control" } }, { "t", { "command" } })
 mapShortcut({ "w", { "control" } }, { "w", { "command" } })
 mapShortcut({ "t", { "control", "shift" } }, { "t", { "command", "shift" } })
 mapShortcut({ ".", { "control" } }, { ".", { "command" } }, { whitelist = { "Firefox", "Google Chrome" } })
+mapShortcut({ "r", { "control" } }, { "r", { "command" } }, { whitelist = { "Firefox", "Google Chrome" } })
+mapShortcut(
+  { "r", { "control", "shift" } },
+  { "r", { "command", "shift" } },
+  { whitelist = { "Firefox", "Google Chrome" } }
+)
 
 -- spotlight
 mapShortcut({ "Space", { SUPER } }, { "Space", { "command" } })
@@ -245,12 +251,12 @@ if LOG_KEYS then
     .new({ hs.eventtap.event.types.keyDown }, function(event)
       info(
         "keyDown event: "
-          .. string.format(
-            " Key code: %s, Characters: %s, Modifiers: %s",
-            event:getKeyCode(),
-            event:getCharacters(),
-            flagsToString(event:getFlags())
-          )
+        .. string.format(
+          " Key code: %s, Characters: %s, Modifiers: %s",
+          event:getKeyCode(),
+          event:getCharacters(),
+          flagsToString(event:getFlags())
+        )
       )
     end)
     :start())
