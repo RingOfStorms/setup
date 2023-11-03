@@ -37,8 +37,11 @@ grep -q zshenv_mine_all ~/.zshenv || {
 
 touch ~/.zshenv
 grep -q zshenv_mine_joeb ~/.zshenv || {
-  yes_or_no "? Source custom zshenv mine joeb?" && \
-  echo ". "$SCRIPT_DIR"/dotfiles/zshenv_mine_joeb" >> ~/.zshenv 
+  if yes_or_no "? Source custom zshenv mine joeb?"; then
+    echo ". "$SCRIPT_DIR"/dotfiles/zshenv_mine_joeb" >> ~/.zshenv 
+  else
+    echo "# DISABLED # . "$SCRIPT_DIR"/dotfiles/zshenv_mine_joeb" >> ~/.zshenv 
+  fi
 }
 
 touch ~/.zprofile
@@ -48,18 +51,27 @@ grep -q zprofile_mine_all ~/.zprofile || {
 }
 
 grep -q zprofile_work_tl ~/.zprofile || {
-  yes_or_no "? Source custom zprofile work tl?" && \
+  if yes_or_no "? Source custom zprofile work tl?"; then
     echo ". "$SCRIPT_DIR"/dotfiles/zprofile_work_tl" >> ~/.zprofile 
+  else
+    echo "# DISABLED # . "$SCRIPT_DIR"/dotfiles/zprofile_work_tl" >> ~/.zprofile 
+  fi
 }
 
 grep -q zprofile_mine_mbp ~/.zprofile || {
-  yes_or_no "? Source custom zprofile mine mbp?" && \
+  if yes_or_no "? Source custom zprofile mine mbp?"; then
     echo ". "$SCRIPT_DIR"/dotfiles/zprofile_mine_mbp" >> ~/.zprofile 
+  else
+    echo "# DISABLED # . "$SCRIPT_DIR"/dotfiles/zprofile_mine_mbp" >> ~/.zprofile 
+  fi
 }
 
 grep -q zprofile_mine_joeb ~/.zprofile || {
-  yes_or_no "? Source custom zprofile mine joeb?" && \
+  if yes_or_no "? Source custom zprofile mine joeb?"; then
     echo ". "$SCRIPT_DIR"/dotfiles/zprofile_mine_joeb" >> ~/.zprofile 
+  else
+    echo "# DISABLED # . "$SCRIPT_DIR"/dotfiles/zprofile_mine_joeb" >> ~/.zprofile 
+  fi
 }
 
 touch ~/.zshrc
@@ -69,10 +81,14 @@ grep -q zshrc_mine_all ~/.zshrc || {
 }
 
 grep -q zshrc_mine_joeb ~/.zshrc || {
-  yes_or_no "? Source custom zshrc mine joeb?" && \
+  if yes_or_no "? Source custom zshrc mine joeb?"; then
     echo ". "$SCRIPT_DIR"/dotfiles/zshrc_mine_joeb" >> ~/.zshrc 
+  else
+    echo "# DISABLED # . "$SCRIPT_DIR"/dotfiles/zshrc_mine_joeb" >> ~/.zshrc 
+  fi
 }
 
+# TODO this install script sucks and doesn't actually work on first run, needs to be run multiple times since things later in this script require bits from above...
 # . "$HOME/.zshenv"
 # . "$HOME/.zprofile"
 # . "$HOME/.zshrc"
@@ -121,6 +137,9 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 
   FILE=~/.hammerspoon/AwesomeWM.lua
   link_if_ne $FILE $SCRIPT_DIR/config/hammerspoon/AwesomeWM.lua
+
+  FILE=~/.hammerspoon/Util.lua
+  link_if_ne $FILE $SCRIPT_DIR/config/hammerspoon/Util.lua
 
 elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
   echo "Linux specifics..."
