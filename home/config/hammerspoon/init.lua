@@ -51,9 +51,11 @@ local try = function(func)
 end
 
 local function contains(table, item)
-  for _, value in ipairs(table) do
-    if value == item then
-      return true
+  if table then
+    for _, value in ipairs(table) do
+      if value == item then
+        return true
+      end
     end
   end
   return false
@@ -169,20 +171,30 @@ local function mapShortcut(to, from, opts)
   end
   local hotkey = hs.hotkey.bind(to[2], to[1], callFrom, nil, callFrom)
   local events = {}
-  if opts and opts.disabled_apps then
-    events.disabled_apps = hs.application.watcher
+  if opts and opts.whitelist then
+    hotkey:disable()
+    events.whitelist = hs.application.watcher
       .new(function(appName, eventType, appObject)
-        -- hs.alert("Focus " .. appName .. inspect(to) .. " " .. tostring(contains(opts.disabled_apps, appName)) .. ' ' .. inspect(opts))
-        -- If the specific application gains focus, disable the hotkey, else enable
-        if contains(opts.disabled_apps, appName) and eventType == hs.application.watcher.activated then
-          -- delay so if we are in another disabled app it will stay disabled after being enabled
+        local isWhitelisted = contains(opts.whitelist, appName)
+        if isWhitelisted and eventType == hs.application.watcher.activated then
+          hs.timer.doAfter(0.1, function()
+            hotkey:enable()
+          end)
+        elseif isWhitelisted and eventType == hs.application.watcher.deactivated then
+          hotkey:disable()
+        end
+      end)
+      :start()
+  elseif opts and opts.blacklist then
+    events.blacklist = hs.application.watcher
+      .new(function(appName, eventType, appObject)
+        local isBlacklisted = contains(opts.blacklist, appName)
+        if isBlacklisted and eventType == hs.application.watcher.activated then
           hs.timer.doAfter(0.1, function()
             hotkey:disable()
-            -- hs.alert("disabled hotkey")
           end)
-        elseif contains(opts.disabled_apps, appName) and eventType == hs.application.watcher.deactivated then
+        elseif isBlacklisted and eventType == hs.application.watcher.deactivated then
           hotkey:enable()
-          -- hs.alert("enabled hotkey")
         end
       end)
       :start()
@@ -193,14 +205,15 @@ end
 
 -- cmd + {} -> ctrl {} remaps
 mapShortcut({ "f", { "control" } }, { "f", { "command" } })
-mapShortcut({ "a", { "control" } }, { "a", { "command" } }, { disabled_apps = { "WezTerm" } })
-mapShortcut({ "c", { "control" } }, { "c", { "command" } }, { disabled_apps = { "WezTerm" } })
-mapShortcut({ "v", { "control" } }, { "v", { "command" } }, { disabled_apps = { "WezTerm" } })
-mapShortcut({ "x", { "control" } }, { "x", { "command" } }, { disabled_apps = { "WezTerm" } })
-mapShortcut({ "z", { "control" } }, { "z", { "command" } }, { disabled_apps = { "WezTerm" } })
+mapShortcut({ "a", { "control" } }, { "a", { "command" } }, { blacklist = { "WezTerm" } })
+mapShortcut({ "c", { "control" } }, { "c", { "command" } }, { blacklist = { "WezTerm" } })
+mapShortcut({ "v", { "control" } }, { "v", { "command" } }, { blacklist = { "WezTerm" } })
+mapShortcut({ "x", { "control" } }, { "x", { "command" } }, { blacklist = { "WezTerm" } })
+mapShortcut({ "z", { "control" } }, { "z", { "command" } }, { blacklist = { "WezTerm" } })
 mapShortcut({ "t", { "control" } }, { "t", { "command" } })
 mapShortcut({ "w", { "control" } }, { "w", { "command" } })
 mapShortcut({ "t", { "control", "shift" } }, { "t", { "command", "shift" } })
+mapShortcut({ ".", { "control" } }, { ".", { "command" } }, { whitelist = { "Firefox", "Google Chrome" } })
 
 -- spotlight
 mapShortcut({ "Space", { SUPER } }, { "Space", { "command" } })
