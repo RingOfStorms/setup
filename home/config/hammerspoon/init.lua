@@ -171,21 +171,21 @@ local function mapShortcut(to, from, opts)
   local events = {}
   if opts and opts.disabled_apps then
     events.disabled_apps = hs.application.watcher
-      .new(function(appName, eventType, appObject)
-        -- hs.alert("Focus " .. appName .. inspect(to) .. " " .. tostring(contains(opts.disabled_apps, appName)) .. ' ' .. inspect(opts))
-        -- If the specific application gains focus, disable the hotkey, else enable
-        if contains(opts.disabled_apps, appName) and eventType == hs.application.watcher.activated then
-          -- delay so if we are in another disabled app it will stay disabled after being enabled
-          hs.timer.doAfter(0.1, function()
-            hotkey:disable()
-            -- hs.alert("disabled hotkey")
-          end)
-        elseif contains(opts.disabled_apps, appName) and eventType == hs.application.watcher.deactivated then
-          hotkey:enable()
-          -- hs.alert("enabled hotkey")
-        end
-      end)
-      :start()
+        .new(function(appName, eventType, appObject)
+          -- hs.alert("Focus " .. appName .. inspect(to) .. " " .. tostring(contains(opts.disabled_apps, appName)) .. ' ' .. inspect(opts))
+          -- If the specific application gains focus, disable the hotkey, else enable
+          if contains(opts.disabled_apps, appName) and eventType == hs.application.watcher.activated then
+            -- delay so if we are in another disabled app it will stay disabled after being enabled
+            hs.timer.doAfter(0.1, function()
+              hotkey:disable()
+              -- hs.alert("disabled hotkey")
+            end)
+          elseif contains(opts.disabled_apps, appName) and eventType == hs.application.watcher.deactivated then
+            hotkey:enable()
+            -- hs.alert("enabled hotkey")
+          end
+        end)
+        :start()
   end
   persist(events)
   return events, hotkey
@@ -193,11 +193,11 @@ end
 
 -- cmd + {} -> ctrl {} remaps
 mapShortcut({ "f", { "control" } }, { "f", { "command" } })
-mapShortcut({ "a", { "control" } }, { "a", { "command" } })
+mapShortcut({ "a", { "control" } }, { "a", { "command" } }, { disabled_apps = { "WezTerm" } })
 mapShortcut({ "c", { "control" } }, { "c", { "command" } }, { disabled_apps = { "WezTerm" } })
-mapShortcut({ "v", { "control" } }, { "v", { "command" } })
-mapShortcut({ "x", { "control" } }, { "x", { "command" } })
-mapShortcut({ "z", { "control" } }, { "z", { "command" } })
+mapShortcut({ "v", { "control" } }, { "v", { "command" } }, { disabled_apps = { "WezTerm" } })
+mapShortcut({ "x", { "control" } }, { "x", { "command" } }, { disabled_apps = { "WezTerm" } })
+mapShortcut({ "z", { "control" } }, { "z", { "command" } }, { disabled_apps = { "WezTerm" } })
 mapShortcut({ "t", { "control" } }, { "t", { "command" } })
 mapShortcut({ "w", { "control" } }, { "w", { "command" } })
 
@@ -231,12 +231,12 @@ if LOG_KEYS then
     .new({ hs.eventtap.event.types.keyDown }, function(event)
       info(
         "keyDown event: "
-          .. string.format(
-            " Key code: %s, Characters: %s, Modifiers: %s",
-            event:getKeyCode(),
-            event:getCharacters(),
-            flagsToString(event:getFlags())
-          )
+        .. string.format(
+          " Key code: %s, Characters: %s, Modifiers: %s",
+          event:getKeyCode(),
+          event:getCharacters(),
+          flagsToString(event:getFlags())
+        )
       )
     end)
     :start())
