@@ -117,7 +117,10 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
   
   mkdir -p ~/.hammerspoon
   FILE=~/.hammerspoon/init.lua
-  link_if_ne $FILE $SCRIPT_DIR/dotfiles/hammerspoon.lua
+  link_if_ne $FILE $SCRIPT_DIR/config/hammerspoon/init.lua
+
+  FILE=~/.hammerspoon/AwesomeWM.lua
+  link_if_ne $FILE $SCRIPT_DIR/config/hammerspoon/AwesomeWM.lua
 
 elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
   echo "Linux specifics..."
