@@ -28,11 +28,11 @@ else
   hs.alert("Hammerspoon Loaded")
 end
 
-require("AwesomeWM").setup {
+require("AwesomeWM").setup({
   superKey = SUPER,
   windowFrameUpdateInterval = 0,
   guideSettings = { stroke = 3, color = { white = 1 } },
-}
+})
 
 -- Firefox updates
 U.p(hs.eventtap
@@ -62,6 +62,8 @@ U.hs.mapShortcut({ "w", { "control" } }, { "w", { "command" } })
 U.hs.mapShortcut({ "t", { "control", "shift" } }, { "t", { "command", "shift" } })
 U.hs.mapShortcut({ ".", { "control" } }, { ".", { "command" } }, { whitelist = { "Firefox", "Google Chrome" } })
 U.hs.mapShortcut({ "r", { "control" } }, { "r", { "command" } }, { whitelist = { "Firefox", "Google Chrome" } })
+U.hs.mapShortcut({ "=", { "control" } }, { "=", { "command" } }, { whitelist = { "Firefox", "Google Chrome" } })
+U.hs.mapShortcut({ "-", { "control" } }, { "-", { "command" } }, { whitelist = { "Firefox", "Google Chrome" } })
 U.hs.mapShortcut(
   { "r", { "control", "shift" } },
   { "r", { "command", "shift" } },
@@ -78,13 +80,13 @@ U.hs.mapShortcut({ "q", { SUPER } }, { "q", { "command" } })
 -- Create an event tap that listens for all events (needs to stay global or it will stop on its own)
 -- U.p(hs.eventtap
 --   .new({ hs.eventtap.event.types.keyDown }, function(event)
---     info(
+--     U.info(
 --       "keyDown event: "
 --       .. string.format(
 --         " Key code: %s, Characters: %s, Modifiers: %s",
 --         event:getKeyCode(),
 --         event:getCharacters(),
---         flagsToString(event:getFlags())
+--         U.hs.flagsToString(event:getFlags())
 --       )
 --     )
 --   end)
@@ -92,7 +94,7 @@ U.hs.mapShortcut({ "q", { SUPER } }, { "q", { "command" } })
 
 -- U.p(hs.application.watcher
 --   .new(function(appName, eventType, appObject)
---     info("app event: " .. appName .. " " .. eventType .. " " .. inspect(appObject))
+--     U.info("app event: " .. appName .. " " .. eventType .. " " .. U.inspect(appObject))
 --   end)
 --   :start())
 
