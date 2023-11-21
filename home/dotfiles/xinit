@@ -4,6 +4,10 @@ xsetroot -solid black
 xset b 20 # set bell to 20%
 xset s off # screensaver off
 
+xmodmap -e "pointer = 1 2 3 5 4 7 6 8 9 10 11 12" 2> /dev/null
+setxkbmap -option caps:escape
+xset b off
+
 dbus-update-activation-environment DISPLAY XAUTHORITY
 
 exec /usr/bin/awesome
