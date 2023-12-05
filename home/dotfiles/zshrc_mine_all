@@ -275,9 +275,11 @@ if assert_command cargo quiet; then
   fi
   alias cf='genemichaels -qp && c +nightly fmt'
   alias cr='c run'
-  alias cwr='c watch -x run'
+  alias cw='c watch -x'
+  alias cwr='cw run'
   alias cc='c check'
   alias cwc='c watch -x check'
+  alias ct='c test'
 fi
 
 if assert_command evcxr quiet; then
