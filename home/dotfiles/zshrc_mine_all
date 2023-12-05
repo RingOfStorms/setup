@@ -193,6 +193,11 @@ master () {
   pull
 }
 
+mp () {
+  master
+  prunel
+}
+
 pullmaster () {
   assert_command git
   git pull origin $(getdefault)
