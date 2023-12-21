@@ -37,7 +37,8 @@ alias date_short='date +"%Y-%m-%d"'
 alias ls="ls --color -Ga"
 alias ll="ls --color -Gal"
 alias la="ls --color -GA"
-alias lss="du --max-depth=0 -h * | sort"
+alias lss="du --max-depth=0 * | sort -s -n -k 1,1"
+alias lsh="du --max-depth=0 -h *"
 
 alias psg='ps aux | head -n 1 && ps aux | grep -v "grep" | grep'
 
