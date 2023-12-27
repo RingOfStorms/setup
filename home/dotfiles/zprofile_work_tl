@@ -184,11 +184,7 @@ gif () {
     echo "No gif specified"
     return 1
   fi
-  if [[ -z $2 ]]; then
-    echo "No output specified"
-    return 1
-  fi
-  ffmpeg -i $1 -filter_complex "fps=7,scale=iw:-1:flags=lanczos,split[s0][s1];[s0]palettegen=max_colors=32[p];[s1][p]paletteuse=dither=bayer" $2
+  ffmpeg -i $1 -filter_complex "fps=7,scale=iw:-1:flags=lanczos,split[s0][s1];[s0]palettegen=max_colors=32[p];[s1][p]paletteuse=dither=bayer" $1".gif"
 }
 
 tnodequit() {
