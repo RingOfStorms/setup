@@ -179,6 +179,18 @@ morning () {
   open https://mail.google.com/mail/u/0/#inbox
 }
 
+gif () {
+  if [[ -z $1 ]]; then
+    echo "No gif specified"
+    return 1
+  fi
+  if [[ -z $2 ]]; then
+    echo "No output specified"
+    return 1
+  fi
+  ffmpeg -i $1 -filter_complex "fps=7,scale=iw:-1:flags=lanczos,split[s0][s1];[s0]palettegen=max_colors=32[p];[s1][p]paletteuse=dither=bayer" $2
+}
+
 tnodequit() {
     PIDS=$(ps aux | grep node | grep tempus | awk '{print $2}')
     echo 'Killing: '${PIDS}
