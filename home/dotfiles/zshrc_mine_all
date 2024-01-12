@@ -273,6 +273,11 @@ from_master () {
   git checkout $(getdefault) $@
 }
 
+# MISE
+if assert_command mise qiet; then
+  alias m='mise'
+fi
+
 # CARGO
 if assert_command cargo quiet; then
   if assert_command sccache quiet; then
@@ -316,11 +321,6 @@ if assert_command rg quiet; then
   alias rg="rg --no-ignore"
   alias rgt="rg --no-ignore -g'!*.test.*' -g'!__mocks__/'"
   alias rgf="rg --files 2> /dev/null | rg"
-fi
-
-# asdf / rtx
-if assert_command rtx quiet; then
-  alias asdf=rtx
 fi
 
 # firefox

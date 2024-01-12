@@ -12,4 +12,4 @@ if [[ -d "$HOME/.cargo" ]]; then
   . "$HOME/.cargo/env"
 fi
 
-eval "$(rtx activate zsh)"
+eval "$(/home/josh/.local/bin/mise activate zsh)"
