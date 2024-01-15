@@ -105,9 +105,9 @@ command -v cargo-binstall >/dev/null 2>&1 || {
     cargo install cargo-binstall
 }
 
-command -v rtx >/dev/null 2>&1 || {
-    echo "> Installing rtx..." && \
-    cargo-binstall rtx-cli -y
+command -v mise >/dev/null 2>&1 || {
+    echo "> Installing mise..." && \
+    curl https://mise.jdx.dev/install.sh | sh
 }
 
 command -v sccache >/dev/null 2>&1 || {
