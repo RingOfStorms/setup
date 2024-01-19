@@ -13,12 +13,12 @@
 - rust / rustup,cargo,cargo-binstall
     - stable + nightly installed
 - cargo-binstall
-    - rtx-cli
     - sccache
     - genemichaels
     - evcxr_repl
 
-- rtx
+- install mise
+- mise
     - neovim
     - node@__
     - python@__

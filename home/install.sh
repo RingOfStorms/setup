@@ -120,11 +120,11 @@ command -v genemichaels >/dev/null 2>&1 || {
   cargo-binstall genemichaels -y
 }
 
-#RTX_PLUGINS="neovim python age"
-#for plugin in $RTX_PLUGINS; do
-    #if [ ! rtx plugins | grep $plugin ]; then
-        #echo "Installing $plugin rtx plugin..."
-        #rtx plugin install $plugin
+#MISE_PLUGINS="neovim python age"
+#for plugin in $MISE_PLUGINS; do
+    #if [ ! mise plugins | grep $plugin ]; then
+        #echo "Installing $plugin mise plugin..."
+        #mise plugin install $plugin
     #fi
 #done
 
