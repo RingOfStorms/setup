@@ -60,14 +60,14 @@ U.hs.mapShortcut({ "z", { "control" } }, { "z", { "command" } }, { blacklist = {
 U.hs.mapShortcut({ "t", { "control" } }, { "t", { "command" } })
 U.hs.mapShortcut({ "w", { "control" } }, { "w", { "command" } })
 U.hs.mapShortcut({ "t", { "control", "shift" } }, { "t", { "command", "shift" } })
-U.hs.mapShortcut({ ".", { "control" } }, { ".", { "command" } }, { whitelist = { "Firefox", "Google Chrome" } })
-U.hs.mapShortcut({ "r", { "control" } }, { "r", { "command" } }, { whitelist = { "Firefox", "Google Chrome" } })
-U.hs.mapShortcut({ "=", { "control" } }, { "=", { "command" } }, { whitelist = { "Firefox", "Google Chrome" } })
-U.hs.mapShortcut({ "-", { "control" } }, { "-", { "command" } }, { whitelist = { "Firefox", "Google Chrome" } })
+U.hs.mapShortcut({ ".", { "control" } }, { ".", { "command" } }, { whitelist = { "Firefox", "Google Chrome", "Arc" } })
+U.hs.mapShortcut({ "r", { "control" } }, { "r", { "command" } }, { whitelist = { "Firefox", "Google Chrome", "Arc" } })
+U.hs.mapShortcut({ "=", { "control" } }, { "=", { "command" } }, { whitelist = { "Firefox", "Google Chrome", "Arc" } })
+U.hs.mapShortcut({ "-", { "control" } }, { "-", { "command" } }, { whitelist = { "Firefox", "Google Chrome", "Arc" } })
 U.hs.mapShortcut(
   { "r", { "control", "shift" } },
   { "r", { "command", "shift" } },
-  { whitelist = { "Firefox", "Google Chrome" } }
+  { whitelist = { "Firefox", "Google Chrome", "Arc" } }
 )
 
 -- spotlight shortcut with super key
