@@ -302,6 +302,10 @@ fi
 alias n=nvim
 alias nn="nvim --headless "+SessionDelete" +qa > /dev/null 2>&1 && nvim"
 
+# tmux
+alias t=tmux
+alias ta=tmux a
+
 # bat, cat(1) with wings
 # if assert_command bat; then
   alias bat='bat --theme Coldark-Dark'
@@ -343,3 +347,7 @@ explain () {
 rm_node_modules () {
   find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +
 }
+
+# if [ -z "$TMUX" ]; then
+#   tmux
+# fi

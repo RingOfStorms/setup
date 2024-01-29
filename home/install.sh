@@ -120,6 +120,8 @@ command -v genemichaels >/dev/null 2>&1 || {
   cargo-binstall genemichaels -y
 }
 
+# TODO install tmux
+
 #MISE_PLUGINS="neovim python age"
 #for plugin in $MISE_PLUGINS; do
     #if [ ! mise plugins | grep $plugin ]; then
@@ -143,7 +145,6 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 
 elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
   echo "Linux specifics..."
-
   # awesome
   FILE=~/.config/awesome/rc.lua
   link_if_ne $FILE $SCRIPT_DIR/config/awesome/rc.lua
@@ -154,6 +155,18 @@ fi
 # wezterm
 FILE=~/.wezterm.lua
 link_if_ne $FILE $SCRIPT_DIR/dotfiles/wezterm.lua
+
+# tmux
+mkdir -p ~/.config/tmux
+FILE=~/.config/tmux/tmux.reset.conf
+link_if_ne $FILE $SCRIPT_DIR/config/tmux/tmux.reset.conf
+FILE=~/.config/tmux/tmux.conf
+link_if_ne $FILE $SCRIPT_DIR/config/tmux/tmux.conf
+
+# starship
+mkdir -p ~/.config
+FILE=~/.config/starship.toml
+link_if_ne $FILE $SCRIPT_DIR/config/starship.toml
 
 # postgres settings
 FILE=~/.psqlrc
