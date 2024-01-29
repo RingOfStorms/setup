@@ -157,6 +157,7 @@ FILE=~/.wezterm.lua
 link_if_ne $FILE $SCRIPT_DIR/dotfiles/wezterm.lua
 
 # tmux
+# TODO install tmux itself, fzf (call and init this)
 mkdir -p ~/.config/tmux
 FILE=~/.config/tmux/tmux.reset.conf
 link_if_ne $FILE $SCRIPT_DIR/config/tmux/tmux.reset.conf

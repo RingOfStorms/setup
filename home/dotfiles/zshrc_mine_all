@@ -303,8 +303,8 @@ alias n=nvim
 alias nn="nvim --headless "+SessionDelete" +qa > /dev/null 2>&1 && nvim"
 
 # tmux
-alias t=tmux
-alias ta=tmux a
+alias t=tmux -f ~/.config/tmux/tmux.conf
+alias ta=t a
 
 # bat, cat(1) with wings
 # if assert_command bat; then

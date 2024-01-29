@@ -82,7 +82,7 @@ config.color_scheme = "Catppuccin Mocha"
 
 if isMac then
   config.font_size = 16
-  config.window_decorations = "INTEGRATED_BUTTONS|RESIZE"
+  config.window_decorations = "NONE"
 end
 
 config.window_frame = {
