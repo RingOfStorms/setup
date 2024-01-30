@@ -2,7 +2,7 @@ add_newline = false
 
 # A minimal left prompt
 # format = """$directory$character"""
-palette = "catppuccin_mocha"
+palette = "catppuccin_coal"
 # move the rest of the prompt to the right
 # right_format = """$all"""
 
@@ -17,7 +17,8 @@ palette = "catppuccin_mocha"
 # [docker_context]
 # disabled = true
 
-[palettes.catppuccin_mocha]
+[palettes.catppuccin_coal]
+# Same as catppuccin mocha for these
 rosewater = "#f5e0dc"
 flamingo = "#f2cdcd"
 pink = "#f5c2e7"
