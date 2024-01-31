@@ -2,8 +2,7 @@
 
 # # Sourced after profile, only used for interactive shells
 
-
-# Helper utility for checking that a command exists
+# # Helper utilities for checking that a command exists
 assert_command () {
   missing=0
 
@@ -18,10 +17,17 @@ assert_command () {
 
   return missing
 }
+# ## End utilities
 
 # # Settings
+# Case insensitive auto complete
+# https://superuser.com/a/1092328
+autoload -Uz compinit && compinit
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+
 export CLICOLOR=1
 export LSCOLORS=gxBxhxDxfxhxhxhxhxcxcx
+
 if assert_command nvim quiet; then
   export VISUAL="nvim"
 else
@@ -29,8 +35,20 @@ else
 fi
 export EDITOR="$VISUAL"
 
+# Always be in tmux for interactive shells?
+# if [ -z "$TMUX" ]; then
+#   tmux
+# fi
 
-# # Aliases and Commands
+# # Interactive Shell Setup
+if assert_command starship quiet; then
+  eval "$(starship init zsh)"
+fi
+if assert_command atuin quiet; then
+  eval "$(atuin init zsh)"
+fi
+
+# Aliases and Commands
 # Unix
 alias date_compact='date +"%Y%m%d"'
 alias date_short='date +"%Y-%m-%d"'
@@ -307,10 +325,10 @@ alias t=tmux -f ~/.config/tmux/tmux.conf
 alias ta=t a
 
 # bat, cat(1) with wings
-# if assert_command bat; then
+if assert_command bat; then
   alias bat='bat --theme Coldark-Dark'
   alias cat='bat --pager=never -p'
-# fi
+fi
 
 # docker
 if assert_command docker quiet; then
@@ -348,6 +366,3 @@ rm_node_modules () {
   find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +
 }
 
-# if [ -z "$TMUX" ]; then
-#   tmux
-# fi

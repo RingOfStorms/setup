@@ -169,6 +169,12 @@ mkdir -p ~/.config
 FILE=~/.config/starship.toml
 link_if_ne $FILE $SCRIPT_DIR/config/starship.toml
 
+# atuin
+mkdir -p ~/.config/atuin
+FILE=~/.config/atuin/config.toml
+# link_if_ne $FILE $SCRIPT_DIR/config/atuin/config.toml
+cp $SCRIPT_DIR/config/atuin/config.toml $FILE
+
 # postgres settings
 FILE=~/.psqlrc
 link_if_ne $FILE $SCRIPT_DIR/dotfiles/psqlrc

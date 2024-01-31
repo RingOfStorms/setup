@@ -14,68 +14,94 @@ if wezterm.config_builder then
 end
 
 -- config.disable_default_key_bindings = true
--- config.keys = {
--- {
---   key = "w",
---   mods = "CTRL",
---   action = wezterm.action.CloseCurrentTab({ confirm = true }),
--- },
--- {
---   key = "t",
---   mods = "CTRL",
---   action = wezterm.action.SpawnTab("CurrentPaneDomain"),
--- },
--- {
---   key = "1",
---   mods = "CTRL",
---   action = wezterm.action.ActivateTab(0),
--- },
--- {
---   key = "2",
---   mods = "CTRL",
---   action = wezterm.action.ActivateTab(1),
--- },
--- {
---   key = "3",
---   mods = "CTRL",
---   action = wezterm.action.ActivateTab(2),
--- },
--- {
---   key = "4",
---   mods = "CTRL",
---   action = wezterm.action.ActivateTab(3),
--- },
--- {
---   key = "5",
---   mods = "CTRL",
---   action = wezterm.action.ActivateTab(4),
--- },
--- {
---   key = "6",
---   mods = "CTRL",
---   action = wezterm.action.ActivateTab(5),
--- },
--- {
---   key = "7",
---   mods = "CTRL",
---   action = wezterm.action.ActivateTab(6),
--- },
--- {
---   key = "8",
---   mods = "CTRL",
---   action = wezterm.action.ActivateTab(7),
--- },
--- {
---   key = "9",
---   mods = "CTRL",
---   action = wezterm.action.ActivateTab(8),
--- },
--- {
---   key = "0",
---   mods = "CTRL",
---   action = wezterm.action.ActivateTab(9),
--- },
--- }
+config.keys = {
+  -- Ctrl+K to send Up arrow
+  {
+    key = "k",
+    mods = "CTRL",
+    action = wezterm.action({ SendKey = { key = "UpArrow" } }),
+  },
+  -- Ctrl+J to send Down arrow
+  {
+    key = "j",
+    mods = "CTRL",
+    action = wezterm.action({ SendKey = { key = "DownArrow" } }),
+  },
+  {
+    key = "w",
+    mods = "CTRL",
+    action = "DisableDefaultAssignment",
+  },
+  {
+    key = "t",
+    mods = "CTRL",
+    action = "DisableDefaultAssignment",
+  },
+  {
+    key = "w",
+    mods = "CTRL",
+    action = wezterm.action.Multiple({
+      wezterm.action({ SendKey = { key = "Space", mods = "CTRL" } }),
+      wezterm.action({ SendKey = { key = "w" } }),
+    }),
+  },
+
+  -- {
+  --   key = "t",
+  --   mods = "CTRL",
+  --   action = wezterm.action.SpawnTab("CurrentPaneDomain"),
+  -- },
+  -- {
+  --   key = "1",
+  --   mods = "CTRL",
+  --   action = wezterm.action.ActivateTab(0),
+  -- },
+  -- {
+  --   key = "2",
+  --   mods = "CTRL",
+  --   action = wezterm.action.ActivateTab(1),
+  -- },
+  -- {
+  --   key = "3",
+  --   mods = "CTRL",
+  --   action = wezterm.action.ActivateTab(2),
+  -- },
+  -- {
+  --   key = "4",
+  --   mods = "CTRL",
+  --   action = wezterm.action.ActivateTab(3),
+  -- },
+  -- {
+  --   key = "5",
+  --   mods = "CTRL",
+  --   action = wezterm.action.ActivateTab(4),
+  -- },
+  -- {
+  --   key = "6",
+  --   mods = "CTRL",
+  --   action = wezterm.action.ActivateTab(5),
+  -- },
+  -- {
+  --   key = "7",
+  --   mods = "CTRL",
+  --   action = wezterm.action.ActivateTab(6),
+  -- },
+  -- {
+  --   key = "8",
+  --   mods = "CTRL",
+  --   action = wezterm.action.ActivateTab(7),
+  -- },
+  -- {
+  --   key = "9",
+  --   mods = "CTRL",
+  --   action = wezterm.action.ActivateTab(8),
+  -- },
+  -- {
+  --   key = "0",
+  --   mods = "CTRL",
+  --   action = wezterm.action.ActivateTab(9),
+  -- },
+}
 
 -- config.color_scheme = "Material Darker (base16)"
 
