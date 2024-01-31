@@ -13,8 +13,20 @@ if wezterm.config_builder then
   config = wezterm.config_builder()
 end
 
--- config.disable_default_key_bindings = true
+config.disable_default_key_bindings = true
 config.keys = {
+  -- Manually add Ctrl+Shift+V for Paste
+  {
+    key = "v",
+    mods = "CTRL|SHIFT",
+    action = wezterm.action.PasteFrom("Clipboard"),
+  },
+  -- Manually add Ctrl+Shift+C for Copy
+  {
+    key = "c",
+    mods = "CTRL|SHIFT",
+    action = wezterm.action.CopyTo("Clipboard"),
+  },
   -- Ctrl+K to send Up arrow
   {
     key = "k",
@@ -27,83 +39,33 @@ config.keys = {
     mods = "CTRL",
     action = wezterm.action({ SendKey = { key = "DownArrow" } }),
   },
-  {
-    key = "w",
-    mods = "CTRL",
-    action = "DisableDefaultAssignment",
-  },
+  -- Create new TMUX window
   {
     key = "t",
     mods = "CTRL",
-    action = "DisableDefaultAssignment",
+    action = wezterm.action.SendString("\x01" .. "t"),
   },
+  -- Close TMUX window
   {
     key = "w",
     mods = "CTRL",
-    action = wezterm.action.Multiple({
-      wezterm.action({ SendKey = { key = "Space", mods = "CTRL" } }),
-      wezterm.action({ SendKey = { key = "w" } }),
-    }),
+    action = wezterm.action.SendString("\x01" .. "w"),
   },
-
-  -- {
-  --   key = "t",
-  --   mods = "CTRL",
-  --   action = wezterm.action.SpawnTab("CurrentPaneDomain"),
-  -- },
-  -- {
-  --   key = "1",
-  --   mods = "CTRL",
-  --   action = wezterm.action.ActivateTab(0),
-  -- },
-  -- {
-  --   key = "2",
-  --   mods = "CTRL",
-  --   action = wezterm.action.ActivateTab(1),
-  -- },
-  -- {
-  --   key = "3",
-  --   mods = "CTRL",
-  --   action = wezterm.action.ActivateTab(2),
-  -- },
-  -- {
-  --   key = "4",
-  --   mods = "CTRL",
-  --   action = wezterm.action.ActivateTab(3),
-  -- },
-  -- {
-  --   key = "5",
-  --   mods = "CTRL",
-  --   action = wezterm.action.ActivateTab(4),
-  -- },
-  -- {
-  --   key = "6",
-  --   mods = "CTRL",
-  --   action = wezterm.action.ActivateTab(5),
-  -- },
-  -- {
-  --   key = "7",
-  --   mods = "CTRL",
-  --   action = wezterm.action.ActivateTab(6),
-  -- },
-  -- {
-  --   key = "8",
-  --   mods = "CTRL",
-  --   action = wezterm.action.ActivateTab(7),
-  -- },
-  -- {
-  --   key = "9",
-  --   mods = "CTRL",
-  --   action = wezterm.action.ActivateTab(8),
-  -- },
-  -- {
-  --   key = "0",
-  --   mods = "CTRL",
-  --   action = wezterm.action.ActivateTab(9),
-  -- },
+  -- Close TMUX window
+  {
+    key = "o",
+    mods = "CTRL",
+    action = wezterm.action.SendString("\x01" .. "o"),
+  },
 }
 
--- config.color_scheme = "Material Darker (base16)"
+for i = 1, 9 do
+  table.insert(config.keys, {
+    key = tostring(i),
+    mods = "CTRL",
+    action = wezterm.action.SendString("\x01" .. tostring(i)),
+  })
+end
 
 -- My modifications: https://gist.github.com/RingOfStorms/b2ff0c4e37f5be9f985c72c3ec9a3e62
 local scheme = wezterm.get_builtin_color_schemes()["Catppuccin Mocha"]

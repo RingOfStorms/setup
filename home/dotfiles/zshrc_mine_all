@@ -45,7 +45,7 @@ if assert_command starship quiet; then
   eval "$(starship init zsh)"
 fi
 if assert_command atuin quiet; then
-  eval "$(atuin init zsh)"
+  eval "$(atuin init zsh --disable-up-arrow)"
 fi
 
 # Aliases and Commands
