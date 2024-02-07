@@ -40,7 +40,7 @@ U.p(hs.eventtap
     -- Change ctrl left click to cmd left click
     if hs.window and hs.window.focusedWindow() then
       local app = hs.window.focusedWindow():application()
-      if app and app:name() == "Firefox" then
+      if app and (app:name() == "Firefox" or app:name() == "Vivaldi") then
         if event:getFlags()["ctrl"] then
           U.hs.click(event:location(), { "cmd" })
           return true
@@ -61,14 +61,76 @@ U.hs.mapShortcut({ "t", { "control" } }, { "t", { "command" } }, { blacklist = {
 U.hs.mapShortcut({ "w", { "control" } }, { "w", { "command" } }, { blacklist = { "WezTerm" } })
 U.hs.mapShortcut({ "t", { "control", "shift" } }, { "t", { "command", "shift" } }, { blacklist = { "WezTerm" } })
 U.hs.mapShortcut({ ".", { "control" } }, { ".", { "command" } }, { whitelist = { "Firefox", "Google Chrome", "Arc" } })
-U.hs.mapShortcut({ "r", { "control" } }, { "r", { "command" } }, { whitelist = { "Firefox", "Google Chrome", "Arc" } })
-U.hs.mapShortcut({ "=", { "control" } }, { "=", { "command" } }, { whitelist = { "Firefox", "Google Chrome", "Arc" } })
-U.hs.mapShortcut({ "-", { "control" } }, { "-", { "command" } }, { whitelist = { "Firefox", "Google Chrome", "Arc" } })
+U.hs.mapShortcut(
+  { "r", { "control" } },
+  { "r", { "command" } },
+  { whitelist = { "Firefox", "Google Chrome", "Arc", "Vivaldi" } }
+)
+U.hs.mapShortcut(
+  { "=", { "control" } },
+  { "=", { "command" } },
+  { whitelist = { "Firefox", "Google Chrome", "Arc", "Vivaldi" } }
+)
+U.hs.mapShortcut(
+  { "-", { "control" } },
+  { "-", { "command" } },
+  { whitelist = { "Firefox", "Google Chrome", "Arc", "Vivaldi" } }
+)
+-- for i = 1, 9 do
+--   U.hs.mapShortcut(
+--     { tostring(i), { "control" } },
+--     { tostring(i), { "command" } },
+--     { whitelist = { "Firefox", "Google Chrome", "Arc", "Vivaldi" } }
+--   )
+-- end
+
 U.hs.mapShortcut(
   { "r", { "control", "shift" } },
   { "r", { "command", "shift" } },
-  { whitelist = { "Firefox", "Google Chrome", "Arc" } }
+  { whitelist = { "Firefox", "Google Chrome", "Arc", "Vivaldi" } }
 )
+
+-- Vivaldi 1password hotkey just does not work for me... so we'll click the button instead with hammerspoon
+local vivaldi_1password_hotkey = hs.hotkey.bind({ "ctrl" }, ".", function()
+  -- Check if Vivaldi is the active application
+  local app = hs.application.frontmostApplication()
+  if app:name() == "Vivaldi" then
+    -- Get the frame of the frontmost window
+    local win = app:focusedWindow()
+    local frame = win:frame()
+
+    -- Location of the 1Password icon on my machine
+    local iconX = frame.x + frame.w - 119 -- X coordinate from the right edge of the window
+    local iconY = frame.y + 54            -- Y coordinate from the top edge of the window
+    U.hs.click(hs.geometry.point(iconX, iconY), {}, true)
+
+    -- DEBUG
+    -- local circle = hs.drawing.circle(hs.geometry.rect(iconX - 7.5, iconY - 7.5, 15, 15))
+    -- circle:setFillColor({ ["red"] = 1, ["alpha"] = 1 })
+    -- circle:setStroke(false)
+    -- circle:show()
+    -- hs.timer.doAfter(2, function()
+    --   circle:delete()
+    -- end)
+  else
+    -- hs.alert.show("Vivaldi is not focused")
+    -- -- Send the Ctrl + . keystroke to the system
+    hs.eventtap.keyStroke({ "ctrl" }, ".", 0)
+  end
+end)
+vivaldi_1password_hotkey:disable()
+U.p(hs.application.watcher
+  .new(function(appName, eventType, appObject)
+    -- hs.alert("test " .. appName)
+    if appName == "Vivaldi" and eventType == hs.application.watcher.activated then
+      hs.timer.doAfter(0.1, function()
+        vivaldi_1password_hotkey:enable()
+      end)
+    elseif appName == "Vivaldi" and eventType == hs.application.watcher.deactivated then
+      vivaldi_1password_hotkey:disable()
+    end
+  end)
+  :start())
 
 -- spotlight shortcut with super key
 -- TODO replace this with a better app picker? I Don't like spotlight

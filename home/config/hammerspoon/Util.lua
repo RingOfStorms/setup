@@ -68,10 +68,14 @@ MOD.table = {
 }
 
 MOD.hs = {
-  click = function(location, modifiers)
+  click = function(location, modifiers, returnToOriginalLocation)
+    local currentPos = hs.mouse.getAbsolutePosition()
     hs.eventtap.event.newMouseEvent(hs.eventtap.event.types["leftMouseDown"], location, modifiers):post()
-    hs.timer.doAfter(0.01, function()
+    hs.timer.doAfter(0.005, function()
       hs.eventtap.event.newMouseEvent(hs.eventtap.event.types["leftMouseUp"], location, modifiers):post()
+      if returnToOriginalLocation then
+        hs.mouse.setAbsolutePosition(currentPos)
+      end
     end)
   end,
   mapShortcut = function(to, from, opts)
@@ -88,32 +92,32 @@ MOD.hs = {
     if opts and opts.whitelist then
       hotkey:disable()
       events.whitelist = hs.application.watcher
-        .new(function(appName, eventType, appObject)
-          -- hs.alert("test " .. appName)
-          local isWhitelisted = MOD.table.contains(opts.whitelist, appName)
-          if isWhitelisted and eventType == hs.application.watcher.activated then
-            hs.timer.doAfter(0.1, function()
-              hotkey:enable()
-            end)
-          elseif isWhitelisted and eventType == hs.application.watcher.deactivated then
-            hotkey:disable()
-          end
-        end)
-        :start()
+          .new(function(appName, eventType, appObject)
+            -- hs.alert("test " .. appName)
+            local isWhitelisted = MOD.table.contains(opts.whitelist, appName)
+            if isWhitelisted and eventType == hs.application.watcher.activated then
+              hs.timer.doAfter(0.1, function()
+                hotkey:enable()
+              end)
+            elseif isWhitelisted and eventType == hs.application.watcher.deactivated then
+              hotkey:disable()
+            end
+          end)
+          :start()
     elseif opts and opts.blacklist then
       events.blacklist = hs.application.watcher
-        .new(function(appName, eventType, appObject)
-          local isBlacklisted = MOD.table.contains(opts.blacklist, appName)
-          if isBlacklisted and eventType == hs.application.watcher.activated then
-            -- hs.alert("Disabled hotkey " .. MOD.inspect(to))
-            hs.timer.doAfter(0.1, function()
-              hotkey:disable()
-            end)
-          elseif isBlacklisted and eventType == hs.application.watcher.deactivated then
-            hotkey:enable()
-          end
-        end)
-        :start()
+          .new(function(appName, eventType, appObject)
+            local isBlacklisted = MOD.table.contains(opts.blacklist, appName)
+            if isBlacklisted and eventType == hs.application.watcher.activated then
+              -- hs.alert("Disabled hotkey " .. MOD.inspect(to))
+              hs.timer.doAfter(0.1, function()
+                hotkey:disable()
+              end)
+            elseif isBlacklisted and eventType == hs.application.watcher.deactivated then
+              hotkey:enable()
+            end
+          end)
+          :start()
     end
     MOD.p(events)
     return events, hotkey
