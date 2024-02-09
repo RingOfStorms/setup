@@ -63,7 +63,7 @@ style = "auto"
 
 ## what to do when the escape key is pressed when searching
 ## possible values: return-original, return-query
-# exit_mode = "return-original"
+exit_mode = "return-query"
 
 ## number of context lines to show when scrolling by pages
 # scroll_context_lines = 1
