@@ -33,3 +33,5 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
+# Aider coder files
+.aider*
