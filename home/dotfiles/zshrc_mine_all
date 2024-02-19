@@ -66,6 +66,8 @@ start () {
   if [ -f package.json ]; then
     if grep -q '"dev"' package.json; then
       npm run dev
+    elif grep -q '"start:local"' package.json; then
+      npm run start:local
     elif grep -q '"start"' package.json; then
       npm start
     else
