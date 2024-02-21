@@ -324,7 +324,11 @@ alias nn="nvim --headless "+SessionDelete" +qa > /dev/null 2>&1 && nvim"
 
 # tmux
 alias t=tmux -f ~/.config/tmux/tmux.conf
-alias tat=t a
+# alias tat=t a
+tat () {
+  tmux ls 2>/dev/null && tmux attach-session -t "$(tmux ls | head -n1 | cut -d: -f1)" || tmux new-session
+}
+
 
 # bat, cat(1) with wings
 if assert_command bat; then
