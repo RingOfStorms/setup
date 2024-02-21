@@ -27,18 +27,6 @@ config.keys = {
     mods = "CTRL|SHIFT",
     action = wezterm.action.CopyTo("Clipboard"),
   },
-  -- Ctrl+K to send Up arrow
-  {
-    key = "k",
-    mods = "CTRL",
-    action = wezterm.action({ SendKey = { key = "UpArrow" } }),
-  },
-  -- Ctrl+J to send Down arrow
-  {
-    key = "j",
-    mods = "CTRL",
-    action = wezterm.action({ SendKey = { key = "DownArrow" } }),
-  },
   -- Create new TMUX window
   {
     key = "t",
