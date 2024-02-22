@@ -47,6 +47,10 @@ fi
 if assert_command atuin quiet; then
   eval "$(atuin init zsh --disable-up-arrow)"
 fi
+if assert_command zoxide quiet; then
+  eval "$(zoxide init zsh)"
+  alias cd=z
+fi
 
 # Aliases and Commands
 # Unix
