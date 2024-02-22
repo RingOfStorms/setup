@@ -51,6 +51,13 @@ if assert_command zoxide quiet; then
   eval "$(zoxide init zsh)"
   alias cd=z
 fi
+if assert_command fzf quiet; then
+  local fzf_shell_path=$(which fzf | sed 's|/bin.*|/shell|')
+  . $fzf_shell_path"/completion.zsh"
+  if ! assert_command atuin quiet; then
+    . $fzf_shell_path"/key-bindings.zsh"
+  fi
+fi
 
 # Aliases and Commands
 # Unix
