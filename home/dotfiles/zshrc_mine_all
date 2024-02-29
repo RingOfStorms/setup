@@ -47,6 +47,17 @@ fi
 if assert_command atuin quiet; then
   eval "$(atuin init zsh --disable-up-arrow)"
 fi
+if assert_command zoxide quiet; then
+  eval "$(zoxide init zsh)"
+  alias cd=z
+fi
+if assert_command fzf quiet; then
+  local fzf_shell_path=$(which fzf | sed 's|/bin.*|/shell|')
+  . $fzf_shell_path"/completion.zsh"
+  if ! assert_command atuin quiet; then
+    . $fzf_shell_path"/key-bindings.zsh"
+  fi
+fi
 
 # Aliases and Commands
 # Unix
@@ -324,7 +335,11 @@ alias nn="nvim --headless "+SessionDelete" +qa > /dev/null 2>&1 && nvim"
 
 # tmux
 alias t=tmux -f ~/.config/tmux/tmux.conf
-alias tat=t a
+# alias tat=t a
+tat () {
+  tmux ls 2>/dev/null && tmux attach-session -t "$(tmux ls | head -n1 | cut -d: -f1)" || tmux new-session
+}
+
 
 # bat, cat(1) with wings
 if assert_command bat; then
