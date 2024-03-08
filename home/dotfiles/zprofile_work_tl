@@ -53,6 +53,60 @@ killt () {
   # skill_psg crowdstrike # dont do this one security will message you and you will be in trouble
 }
 
+# Check vpn status
+vpnStatus() {
+  osascript <<EOF
+  set vpnStatus to ""
+  tell application "System Events" to tell process "GlobalProtect"
+    click menu bar item 1 of menu bar 2 -- open the menu window
+    if exists button "Connect" of window 1 then
+      set vpnStatus to "vpn disconnected"
+    else if exists button "Disconnect" of window 1 then
+      set vpnStatus to "vpn connected"
+    end if
+    click menu bar item 1 of menu bar 2 -- close the menu window
+  end tell
+  return vpnStatus
+EOF
+}
+
+# Toggle VPN connection
+vpnToggle() {
+    local pass=$(rage -d ~/.config/environment/passwd.age)
+    osascript <<EOF
+    tell application "System Events" to tell process "GlobalProtect"
+        click menu bar item 1 of menu bar 2 -- open the menu window
+        if exists button "Connect" of window 1 then
+          click button 2 of window 1
+          click menu bar item 1 of menu bar 2 -- close the menu window
+
+          repeat
+            if exists (window "GlobalProtect Login") then
+              exit repeat
+            end if
+            delay 0.2
+          end repeat
+
+          tell window "GlobalProtect Login"
+            keystroke "joshua.bell"
+            keystroke return
+            delay 5
+            keystroke "$pass"
+            keystroke return
+          end tell
+          return "Connecting..."
+        else if exists button "Disconnect" of window 1 then
+          click button 2 of window 1 -- disconnects
+          click menu bar item 1 of menu bar 2 -- close the menu window
+          return "Disconnected..."
+        else
+          click menu bar item 1 of menu bar 2 -- close the menu window
+          return "Unable to determine VPN status."
+        end
+    end tell
+EOF
+}
+
 dbaproxy_refresh() {
     ssh-keygen -R dbaproxy.devtempus.com
     ssh-keygen -R dbaproxy.securetempus.com
