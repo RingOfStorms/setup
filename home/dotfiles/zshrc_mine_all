@@ -380,6 +380,15 @@ explain () {
 }
 
 rm_node_modules () {
-  find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +
+  # find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +
+  find "$(pwd)" -type d -name 'node_modules' -execdir sh -c 'if [ -f "package.json" ]; then echo "deleting: {}"; rm -rf "{}"; fi' \;
 }
 
+rm_cargo_targets () {
+  find "$(pwd)" -type d -name 'target' -execdir sh -c 'if [ -f "Cargo.toml" ]; then echo "deleting: {}"; rm -rf "{}"; fi' \;
+}
+
+clean () {
+  rm_node_modules
+  rm_cargo_targets
+}
